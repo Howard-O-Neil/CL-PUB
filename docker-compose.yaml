@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  collaborative-recommender:
+    container_name: collaborative-recommender
+    image: tensorrt-ubuntu18.04-cuda11.4:version1.0
+    devices:
+      - /dev/nvidia0:/dev/nvidia0
+      - /dev/nvidiactl:/dev/nvidiactl
+      - /dev/nvidia-caps:/dev/nvidia-caps
+      - /dev/nvidia-modeset:/dev/nvidia-modeset
+      - /dev/nvidia-uvm:/dev/nvidia-uvm
+      - /dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools
+    volumes:
+      - ./requirement.txt:/collaborative-recommender/requirement.txt:rw
+      - ./src:/collaborative-recommender/src:rw
+      - ./container_share.log:/container_share.log:rw
+    networks:
+      collaborative-recommender-network:
+        ipv4_address: 128.0.1.2
+    entrypoint: ["tail", "-f", "/container_share.log"]
+
+networks:
+  collaborative-recommender-network:
+    ipam:
+      driver: default
+      config:
+        - subnet: "128.0.1.0/24"
