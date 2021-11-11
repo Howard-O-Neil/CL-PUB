@@ -1,4 +1,4 @@
-# collaborative-recommender
+# Collaborative Recommender
 A collaborative recommender built with tensorflow 1x
 
 ## TensorRT
@@ -14,3 +14,6 @@ Optimized image, lighter than official nvidia/cuda (~8GB)
 + Python 3.6.9
 
 Tested with tensorflow-gpu==1.15
+
+## Credits
+TensorRT base image: https://github.com/NVIDIA/TensorRT
