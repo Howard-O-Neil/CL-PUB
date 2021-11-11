@@ -4,19 +4,10 @@ ARG OS_VERSION=18.04
 ARG OS_ARCH=amd64
 
 FROM ubuntu:18.04@sha256:fc0d6af5ab38dab33aa53643c4c4b312c6cd1f044c1a2229b2743b252b9689fc
-# FROM nvidia/cuda:${CUDA_VERSION%.*}-cudnn7-devel-ubuntu${OS_VERSION}
 LABEL maintainer="Howard O'Neil"
 
 ENV TRT_VERSION 7.0.0.11
 SHELL ["/bin/bash", "-c"]
-
-# Setup user account
-ARG uid=1000
-ARG gid=1000
-RUN groupadd -r -f -g ${gid} trtuser && useradd -o -r -u ${uid} -g ${gid} -ms /bin/bash trtuser
-RUN usermod -aG sudo trtuser
-RUN echo 'trtuser:nvidia' | chpasswd
-RUN mkdir -p /workspace && chown trtuser /workspace
 
 # Install requried libraries
 RUN apt-get update && apt-get install -y software-properties-common
@@ -72,8 +63,6 @@ COPY TensorRT-7.0.0.11.Ubuntu-18.04.x86_64-gnu.cuda-10.0.cudnn7.6.tar.gz /
 WORKDIR /
 
 
-# CUDA, with network repos
-
 # Install CUDA
 RUN dpkg -i cuda-repo-ubuntu1804_10.0.130-1_amd64.deb
 RUN rm -rf cuda-repo-ubuntu1804_10.0.130-1_amd64.deb
@@ -113,9 +102,9 @@ RUN v="${TRT_VERSION%.*}-1+cuda${CUDA_VERSION%.*}" &&\
 
 # Set TensorRT environment
 ENV TRT_LIBPATH /usr/lib/x86_64-linux-gnu
-
 ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${TRT_LIBPATH}"
 
+# Install uff (Tensorflow) + graphsurgeon
 RUN tar -xzvf TensorRT-7.0.0.11.Ubuntu-18.04.x86_64-gnu.cuda-10.0.cudnn7.6.tar.gz
 RUN cd TensorRT-7.0.0.11 && pip install graphsurgeon/graphsurgeon-0.4.1-py2.py3-none-any.whl \
     pip install uff/uff-0.6.5-py2.py3-none-any.whl
