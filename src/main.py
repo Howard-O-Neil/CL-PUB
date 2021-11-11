@@ -1,15 +1,29 @@
 import tensorflow as tf
 import numpy as np
 
-m1 = [[1.0, 2.0], [3.0, 4.0]]
-m2 = np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float32)
-m3 = tf.constant([[1.0, 2.0], [3.0, 4.0]])
+tf.compat.v1.disable_eager_execution()
 
-t1 = tf.convert_to_tensor(m1, dtype=tf.float32)
-t2 = tf.convert_to_tensor(m2, dtype=tf.float32)
-t3 = tf.convert_to_tensor(m3, dtype=tf.float32)
+raw_data = np.random.normal(10, 1, 100)
 
-print("\n ======================== \n")
-print(type(t1))
-print(type(t2))
-print(type(t3))
+alpha = tf.constant(0.05)
+curr_value = tf.compat.v1.placeholder(tf.float32)
+prev_avg = tf.Variable(0.)
+
+update_avg = alpha * curr_value + (1 - alpha) * prev_avg
+
+avg_hist = tf.compat.v1.summary.scalar("running average", update_avg)
+value_hist = tf.compat.v1.summary.scalar("incoming_values", curr_value)
+merged = tf.compat.v1.summary.merge_all()
+writer = tf.compat.v1.summary.FileWriter("./logs")
+
+init = tf.compat.v1.global_variables_initializer()
+
+with tf.compat.v1.Session() as sess:
+    sess.run(init)
+    sess.add_graph(sess.graph)
+    for i in range(len(raw_data)):
+        summary_str, curr_avg = sess.run([merged, update_avg],
+            feed_dict={curr_value: raw_data[i]})
+        sess.run(tf.compat.v1.assign(prev_avg, curr_avg))
+        print(raw_data[i], curr_avg)
+        writer.add_summary(summary_str, i)
