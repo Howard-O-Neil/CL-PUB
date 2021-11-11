@@ -5,7 +5,7 @@ ARG OS_ARCH=amd64
 
 FROM ubuntu:18.04@sha256:fc0d6af5ab38dab33aa53643c4c4b312c6cd1f044c1a2229b2743b252b9689fc
 # FROM nvidia/cuda:${CUDA_VERSION%.*}-cudnn7-devel-ubuntu${OS_VERSION}
-LABEL maintainer="NVIDIA CORPORATION"
+LABEL maintainer="Howard O'Neil"
 
 ENV TRT_VERSION 7.0.0.11
 SHELL ["/bin/bash", "-c"]
