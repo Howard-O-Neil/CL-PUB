@@ -1,13 +1,11 @@
-ARG CUDA_VERSION=10.0.130
-ARG CUDNN_VERSION=7.6.5
-ARG OS_VERSION=18.04
-ARG OS_ARCH=amd64
-
 FROM ubuntu:18.04@sha256:fc0d6af5ab38dab33aa53643c4c4b312c6cd1f044c1a2229b2743b252b9689fc
 LABEL maintainer="Howard O'Neil"
 
-ENV TRT_VERSION 7.0.0.11
-SHELL ["/bin/bash", "-c"]
+ENV CUDA_VERSION=10.0.130
+ENV CUDNN_VERSION=7.6.5
+ENV OS_VERSION=18.04
+ENV OS_ARCH=amd64
+ENV TRT_VERSION=7.0.0.11
 
 # Install requried libraries
 RUN apt-get update && apt-get install -y software-properties-common
@@ -53,7 +51,7 @@ COPY cuda-repo-ubuntu1804_10.0.130-1_amd64.deb /
 
 # cuDNN deb
 COPY libcudnn7_7.6.5.32-1+cuda10.0_amd64.deb /
-COPY libcudnn7-dev_7.6.5.32-1+cuda10.0_amd64.deb.deb /
+COPY libcudnn7-dev_7.6.5.32-1+cuda10.0_amd64.deb /
 COPY libcudnn7-doc_7.6.5.32-1+cuda10.0_amd64.deb /
 
 
@@ -68,10 +66,9 @@ RUN dpkg -i cuda-repo-ubuntu1804_10.0.130-1_amd64.deb
 RUN rm -rf cuda-repo-ubuntu1804_10.0.130-1_amd64.deb
 RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
 RUN apt-get update
-RUN apt-get install cuda-10-0
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends cuda-10-0
 
 # CUDA path
-ENV PATH="/usr/local/cuda/bin:{$PATH}"
 
 # CUDA 64 bit libs
 # ALso the first LD_LIBRARY_PATH value
@@ -80,10 +77,10 @@ ENV LD_LIBRARY_PATH="/usr/local/cuda/lib64"
 
 # Install cuDNN
 RUN dpkg -i libcudnn7_7.6.5.32-1+cuda10.0_amd64.deb
-RUN rm -rf libcudnn7_7.6.5.32-1+cuda10.0_amd64.deb
 RUN dpkg -i libcudnn7-dev_7.6.5.32-1+cuda10.0_amd64.deb
-RUN rm -rf libcudnn7-dev_7.6.5.32-1+cuda10.0_amd64.deb
 RUN dpkg -i libcudnn7-doc_7.6.5.32-1+cuda10.0_amd64.deb
+RUN rm -rf libcudnn7_7.6.5.32-1+cuda10.0_amd64.deb
+RUN rm -rf libcudnn7-dev_7.6.5.32-1+cuda10.0_amd64.deb
 RUN rm -rf libcudnn7-doc_7.6.5.32-1+cuda10.0_amd64.deb
 
 
@@ -105,9 +102,9 @@ ENV TRT_LIBPATH /usr/lib/x86_64-linux-gnu
 ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${TRT_LIBPATH}"
 
 # Install uff (Tensorflow) + graphsurgeon
-RUN tar -xzvf TensorRT-7.0.0.11.Ubuntu-18.04.x86_64-gnu.cuda-10.0.cudnn7.6.tar.gz
-RUN cd TensorRT-7.0.0.11 && pip install graphsurgeon/graphsurgeon-0.4.1-py2.py3-none-any.whl \
-    pip install uff/uff-0.6.5-py2.py3-none-any.whl
+RUN sh -c "tar -xzvf TensorRT-7.0.0.11.Ubuntu-18.04.x86_64-gnu.cuda-10.0.cudnn7.6.tar.gz"
+RUN cd TensorRT-7.0.0.11 && pip install graphsurgeon/graphsurgeon-0.4.1-py2.py3-none-any.whl && \
+        pip install uff/uff-0.6.5-py2.py3-none-any.whl
 RUN mkdir -p /usr/local/TensorRT-7.0.0.11/bin
 RUN mv TensorRT-7.0.0.11/bin/* /usr/local/TensorRT-7.0.0.11/bin/
 RUN rm -rf TensorRT-7.0.0.11.Ubuntu-18.04.x86_64-gnu.cuda-10.0.cudnn7.6.tar.gz
@@ -132,7 +129,26 @@ WORKDIR /usr/local/bin
 # Configure NGC
 RUN cd /usr/local/bin && unzip ngccli_linux.zip && chmod u+x ngc && rm ngccli_linux.zip ngc.md5 && echo "no-apikey\nascii\n" | ngc config set
 
+COPY .bashrc /
 WORKDIR /
+
+RUN cat .bashrc > ~/.bashrc
+RUN rm -f .bashrc
+
+# Install nvidia driver suitable for host machine
+# My host machine specs
+#   + kernel: linux510
+#   + nvidia: linux510-nvidia 470.63.01-12
+# The nvidia version in docker must be lower than the host machine
+RUN apt remove -y --purge '^nvidia-driver-*'
+RUN apt autoremove -y
+RUN apt autoclean -y
+RUN DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends nvidia-driver-450
+
+
+# Set environment Path
+ENV PATH="/usr/local/cuda/bin:{$PATH}"
+ENV PATH="/usr/local/TensorRT-7.0.0.11/bin:{$PATH}"
 
 
 RUN ["/bin/bash"]

@@ -17,4 +17,4 @@ application_args+="--device /dev/nvidia-uvm-tools "
 docker container rm -f collab | true && \
 docker network rm collaborative-recommender-network | true && \
 docker network create $netwrok_args && \
-docker run $application_args mingkhoi/tensorrt-ubuntu18.04-cuda11.4:version1.0 tail -f /container_share.log
+docker run $application_args mingkhoi/tensorrt7.0-ubuntu18.04-cuda10.0:version1.0 tail -f /container_share.log
