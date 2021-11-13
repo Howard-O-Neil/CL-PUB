@@ -1,4 +1,4 @@
-import tensorflow as tf
+import tensorflow_core as tf
 import numpy as np
 
 raw_data = np.random.normal(10, 1, 100)
@@ -18,7 +18,7 @@ init = tf.global_variables_initializer()
 
 with tf.Session() as sess:
     sess.run(init)
-    # sess.add_graph(sess.graph)
+    sess.add_graph(sess.graph)
     for i in range(len(raw_data)):
         curr_avg = sess.run(update_avg, feed_dict={curr_value: raw_data[i]})
         # summary_str, curr_avg = sess.run([merged, update_avg],

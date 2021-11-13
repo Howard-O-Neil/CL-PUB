@@ -2,6 +2,7 @@
 **/.venv2
 **/*.deb
 **/*.zip
+**/*.run
 **/*.tar.gz
 **/*.ckpt*
 **/checkpoint
