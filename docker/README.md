@@ -52,8 +52,10 @@ For `ubuntu-18.04-cuda10-cudnn7`
 The CUDA image require interactive installation. The dockerfile is just setup some pre-requisite packages and download repos. Right after you build the image, perform `docker run -it ` and execute `/install-cuda*.sh` by your self. After installation, create new terminal and perform `docker commit` to create image from running docker, tag it whatever you want. And we done, use this CUDA image as the base for tensorRT image.
 <br>
 <br>
-While installation, there's a time when terminal display a term and agreement. To quickly navigate to to bottom, hold `s`. Till you read the bottom, follow the instruction, input options as below
+While installation, there's a time when terminal display a term and agreement. To quickly navigate to to bottom, hold `s`. Till you reach the bottom, follow the instruction, input options as below
+
 ![picture 1](./images/3b04362b71a56243d360a750acc0ad177df689abf69be19774e45813dd1bff43.png)  
+
 Basically the installation UI might be a little bit different. Just remember to **INSTALL ALL CUDA RELATED, ONLY EXCEPT NVIDIA DRIVER**
 
 ## Step 2: Build tensorRT image
@@ -247,7 +249,9 @@ services:
 ## Errors?
 
 ### Nvidia device error
-![picture 1](./images/08010fa6f9ea6c37ae63d72658f5f931683a27466b8b96eda80bf0722278ff1e.png)  
+
+![picture 1](./images/08010fa6f9ea6c37ae63d72658f5f931683a27466b8b96eda80bf0722278ff1e.png)
+
 This occur due to nvidia being not fully generated all dev files required for container. Solution is easy, just run this code in your terminal
 ```bash
 sudo docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi
