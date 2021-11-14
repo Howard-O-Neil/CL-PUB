@@ -1,6 +1,3 @@
-# Nvidia driver
-apt install nvidia-driver-450;
-
 # Install CUDA via RUN file
 sh cuda_10.0.130_410.48_linux.run;
 rm -rf cuda_10.0.130_410.48_linux.run;

@@ -40,7 +40,6 @@ RUN apt-get install -y --no-install-recommends \
     ln -s /usr/bin/python3 python &&\
     ln -s /usr/bin/pip3 pip;
 
-COPY download/cuda_10.0.130_410.48_linux.run /
 COPY .bashrc /
 WORKDIR /
 
@@ -49,20 +48,21 @@ RUN rm -f .bashrc
 
 # Set environment + workdir
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-ENV PATH=/usr/local/cuda-10.0/bin:$PATH
+ENV PATH=/usr/local/cuda/bin:$PATH
 
 # CUDA 64 bit libs
 # ALso the first LD_LIBRARY_PATH value
-ENV LD_LIBRARY_PATH=/usr/local/cuda-10.0/lib64
+ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64
 
-COPY install-cuda10-nvidia450.sh /
+COPY download/cuda_10.2.1_linux.run /
+COPY install-cuda10.0.0-cudnn7.6.5.sh /
 COPY download/libcudnn7_7.6.5.32-1+cuda10.0_amd64.deb /
 COPY download/libcudnn7-dev_7.6.5.32-1+cuda10.0_amd64.deb /
 COPY download/libcudnn7-doc_7.6.5.32-1+cuda10.0_amd64.deb /
 
 WORKDIR /
 
-RUN chmod +x /install-cuda10-nvidia450.sh
+RUN chmod +x /install-cuda10.0.0-cudnn7.6.5.sh
 
 # blacklist nouveau
 RUN mkdir -p /etc/modprobe.d && touch /etc/modprobe.d/blacklist-nouveau.conf

@@ -1,6 +1,45 @@
 version: "3.9"
 
 services:
+  nvidia-container-runtime:
+    container_name: nv-con-runtime
+    image: nvidia/cuda:11.0-base
+    runtime: nvidia
+    privileged: true
+
+    # devices:
+    #   # - /dev:/dev
+    #   - /dev/nvidia0:/dev/nvidia0
+    #   - /dev/nvidiactl:/dev/nvidiactl
+    #   - /dev/nvidia-caps:/dev/nvidia-caps
+    #   - /dev/nvidia-modeset:/dev/nvidia-modeset
+    #   - /dev/nvidia-uvm:/dev/nvidia-uvm
+    #   - /dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools
+    entrypoint: ["nvidia-smi"]
+
+  nvidia-container-toolkit:
+    container_name: nv-con-toolkit
+    image: nvidia/cuda:11.0-base
+    # privileged: true
+
+    devices:
+      # - /dev:/dev
+      - /dev/nvidia0:/dev/nvidia0
+      - /dev/nvidiactl:/dev/nvidiactl
+      - /dev/nvidia-caps:/dev/nvidia-caps
+      - /dev/nvidia-modeset:/dev/nvidia-modeset
+      - /dev/nvidia-uvm:/dev/nvidia-uvm
+      - /dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1 # equivalent for gpus = 1, if this is not set, gpus = all
+              capabilities: [gpu]
+    entrypoint: ["nvidia-smi"]
+
   collaborative-recommender:
     container_name: collaborative-recommender
     image: mingkhoi/ubuntu-18.04-tensorrt7-tf1.15:version1.0
@@ -8,8 +47,13 @@ services:
       - ./requirement.txt:/collaborative-recommender/requirement.txt:rw
       - ./src:/collaborative-recommender/src:rw
       - ./container_share.log:/container_share.log:rw
-    runtime: nvidia
+    # runtime: nvidia
+    # privileged: true
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     devices:
+      # - /dev:/dev
       - /dev/nvidia0:/dev/nvidia0
       - /dev/nvidiactl:/dev/nvidiactl
       - /dev/nvidia-caps:/dev/nvidia-caps
@@ -19,8 +63,14 @@ services:
     networks:
       collaborative-recommender-network:
         ipv4_address: 128.0.1.2
-    # environment:
-    #   - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              # count: 1
+              capabilities: [gpu]
+    # entrypoint: ["nvidia-smi"]
     entrypoint: ["tail", "-f", "/container_share.log"]
 
 networks:
