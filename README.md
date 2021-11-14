@@ -21,7 +21,7 @@ Container packed with
   + tensorflow-gpu 1.15
 + `ubuntu-18.04-tensorrt8-tf2.7`
   + TensorRT 8.2.0.6
-  + CUDA 11.2.0
+  + CUDA 11.2.2
   + cuDNN 8.2.1
   + tensorflow 2.6 (packed with GPU support)
 
