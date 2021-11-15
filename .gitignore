@@ -7,3 +7,4 @@
 **/*.ckpt*
 **/checkpoint
 **/logs
+**/.ipynb_checkpoints

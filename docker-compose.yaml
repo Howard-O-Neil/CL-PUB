@@ -60,9 +60,10 @@ services:
       - /dev/nvidia-modeset:/dev/nvidia-modeset
       - /dev/nvidia-uvm:/dev/nvidia-uvm
       - /dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools
-    networks:
-      collaborative-recommender-network:
-        ipv4_address: 128.0.1.2
+    network_mode: "host"
+    # networks:
+    #   collaborative-recommender-network:
+    #     ipv4_address: 128.0.1.2
     deploy:
       resources:
         reservations:
