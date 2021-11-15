@@ -106,13 +106,13 @@ Remove `systemd.unified_cgroup_hierachy=false` from `/proc/cmdline`.
 Edit your `/etc/docker/daemon.json`
 ```json
 {
-	"data-root": "/virtual/data/docker", // just by personal, please ignore
-    	"runtimes": {
-		"nvidia": {
-	    		"path": "/usr/bin/nvidia-container-runtime",
-	    		"runtimeArgs": []
-		}
-    	}
+    "data-root": "/virtual/data/docker", // just by personal, please ignore
+    "runtimes": {
+	"nvidia": {
+	    "path": "/usr/bin/nvidia-container-runtime",
+	    	"runtimeArgs": []
+	}
+    }
 }
 ```
 
