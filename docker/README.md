@@ -107,12 +107,12 @@ Edit your `/etc/docker/daemon.json`
 ```json
 {
 	"data-root": "/virtual/data/docker", // just by personal, please ignore
-    "runtimes": {
-        "nvidia": {
-            "path": "/usr/bin/nvidia-container-runtime",
-            "runtimeArgs": []
-        }
-    }
+    	"runtimes": {
+		"nvidia": {
+	    		"path": "/usr/bin/nvidia-container-runtime",
+	    		"runtimeArgs": []
+		}
+    	}
 }
 ```
 
@@ -134,8 +134,8 @@ docker run --rm --gpus all \
 	--device /dev/nvidia-modeset  \
 	--device /dev/nvidia-uvm \
 	--device /dev/nvidia-uvm-tools \
-    -e NVIDIA_VISIBLE_DEVICES=all \
-    -e NVIDIA_DRIVER_CAPABILITIES=compute,utility \
+        -e NVIDIA_VISIBLE_DEVICES=all \
+        -e NVIDIA_DRIVER_CAPABILITIES=compute,utility \
 	\
 	tensorRT-TF:latest nvidia-smi
 
@@ -200,8 +200,8 @@ docker run --rm --runtime nvidia \
 	--device /dev/nvidia-modeset  \
 	--device /dev/nvidia-uvm \
 	--device /dev/nvidia-uvm-tools \
-    -e NVIDIA_VISIBLE_DEVICES=all \
-    -e NVIDIA_DRIVER_CAPABILITIES=compute,utility \
+        -e NVIDIA_VISIBLE_DEVICES=all \
+        -e NVIDIA_DRIVER_CAPABILITIES=compute,utility \
 
 	\
 	tensorRT-TF:latest nvidia-smi
