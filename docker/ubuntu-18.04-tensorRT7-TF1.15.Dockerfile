@@ -61,3 +61,15 @@ ENV LD_LIBRARY_PATH=/usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 # Set TensorRT environment
 ENV TRT_LIBPATH=/usr/local/TensorRT-$TRT_VERSION/lib
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TRT_LIBPATH
+
+# Please specify your username
+ARG username=howard 
+
+RUN groupadd -r -f -g ${gid} trtuser && useradd -o -r -u ${uid} -g ${gid} -ms /bin/bash $username
+RUN usermod -aG sudo $username
+RUN echo "$username:123" | chpasswd
+RUN rm /home/$username/.bashrc /home/$username/.profile
+RUN cp ~/.bashrc /home/$username/
+RUN cp ~/.profile /home/$username/
+
+USER $username
