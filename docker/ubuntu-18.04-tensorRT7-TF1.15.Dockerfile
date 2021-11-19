@@ -35,7 +35,7 @@ RUN rm -rf TensorRT-$TRT_VERSION.Ubuntu-18.04.x86_64-gnu.cuda-10.0.cudnn7.6.tar.
 RUN pip3 install --upgrade pip
 RUN pip3 install setuptools>=41.0.0
 RUN pip3 install tensorflow-gpu==1.15
-RUN pip3 install jupyter jupyter-lab
+RUN pip3 install jupyter jupyterlab
 
 # Install Cmake
 RUN cd /tmp && \

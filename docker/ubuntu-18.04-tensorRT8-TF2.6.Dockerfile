@@ -22,7 +22,7 @@ WORKDIR /
 RUN pip3 install --upgrade pip
 RUN pip3 install setuptools>=41.0.0
 RUN pip3 install tensorflow==2.6.2
-RUN pip3 install jupyter jupyter-lab
+RUN pip3 install jupyter jupyterlab
 
 # Install TensorRT
 RUN tar -xzvf TensorRT-$TRT_VERSION.Linux.x86_64-gnu.cuda-11.4.cudnn8.2.tar.gz -C /usr/local/
