@@ -71,7 +71,9 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TRT_LIBPATH
 # Please specify your username
 ARG username=howard 
 
-RUN groupadd -r -f -g ${gid} trtuser && useradd -o -r -u ${uid} -g ${gid} -ms /bin/bash $username
+ARG uid=1000
+ARG gid=1000
+RUN groupadd -r -f -g ${gid} $username && useradd -o -r -u ${uid} -g ${gid} -ms /bin/bash $username
 RUN usermod -aG sudo $username
 RUN echo "$username:123" | chpasswd
 RUN rm /home/$username/.bashrc /home/$username/.profile
