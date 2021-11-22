@@ -5,7 +5,7 @@ import numpy as np
 import utils
 
 learning_rate = 0.001
-training_epochs = 1000
+training_epochs = 100
 reg_lambda = 0.0
 
 x_dataset = np.linspace(-1, 1, 200)
@@ -31,7 +31,6 @@ plt.show()
 X = tf.placeholder(tf.float32)
 Y = tf.placeholder(tf.float32)
 
-
 def model(X, w):
     terms = []
     for i in range(num_coeffs):
@@ -43,13 +42,7 @@ def model(X, w):
 w = tf.Variable([0.0] * num_coeffs, name="parameters")
 y_model = model(X, w)
 
-cost = tf.divide(
-    tf.add(
-        tf.reduce_sum(tf.square(Y - y_model)),
-        tf.multiply(reg_lambda, tf.reduce_sum(tf.square(w))),
-    ),
-    2 * x_train.size,
-)
+cost = tf.square(Y - y_model)
 
 train_op = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
 
@@ -57,24 +50,23 @@ sess = tf.Session()
 init = tf.global_variables_initializer()
 sess.run(init)
 
-list_w = list()
-list_final_cost = list()
+for epoch in range(training_epochs):
+    for (x, y) in zip(x_train, y_train):
+        sess.run(train_op, feed_dict={X: x, Y: y})
 
-for reg_lambda in np.linspace(0, 1, 100):
-    for epoch in range(training_epochs):
-        sess.run(train_op, feed_dict={X: x_train, Y: y_train})
+final_cost = sess.run(cost, feed_dict={X: x_test, Y: y_test})
 
-    print("## Before and after calculate cost")
-    print(np.sum(sess.run(w)))
-    list_final_cost.append(sess.run(cost, feed_dict={X: x_test, Y: y_test}))
-    list_w.append(sess.run(w))
-    print(np.sum(sess.run(w)))
-
-sess.run(cost, feed_dict={X: x_test, Y: y_test})
-print("## After go through all lambda")
-print(np.sum(sess.run(w)))
-
-
+w_val = sess.run(w)
 sess.close()
 
 print("===== Done training =====")
+
+plt.scatter(x_test, y_test)
+
+y_learned = 0
+for i in range(num_coeffs):
+    y_learned += w_val[i] * np.power(x_test, i)
+
+plt.plot(x_test, y_learned, "r^")
+plt.title(f"FINAL COST: ${np.sum(final_cost) / x_train.size}")
+plt.show()
