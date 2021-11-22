@@ -44,9 +44,10 @@ services:
     container_name: collaborative-recommender
     image: mingkhoi/ubuntu-18.04-tensorrt7-tf1.15:version1.0
     volumes:
-      - ./requirement.txt:/collaborative-recommender/requirement.txt:rw
-      - ./src:/collaborative-recommender/src:rw
-      - ./container_share.log:/container_share.log:rw
+      - ./requirement.txt:/home/howard/collaborative-recommender/requirement.txt:rw
+      - ./src:/home/howard/collaborative-recommender/src:rw
+      - ./notebook:/home/howard/collaborative-recommender/notebook:rw
+      - ./container_share.log:/home/howard/container_share.log:rw
     # runtime: nvidia
     # privileged: true
     environment:
@@ -72,7 +73,7 @@ services:
               # count: 1
               capabilities: [gpu]
     # entrypoint: ["nvidia-smi"]
-    entrypoint: ["tail", "-f", "/container_share.log"]
+    entrypoint: ["tail", "-f", "/home/howard/container_share.log"]
 
 networks:
   collaborative-recommender-network:
