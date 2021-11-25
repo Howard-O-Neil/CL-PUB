@@ -1,81 +1,122 @@
-from numpy.lib.function_base import append
 import tensorflow_core as tf
 import numpy as np
 import matplotlib.pyplot as plt
 
-learning_rate = 0.1
-training_epochs = 2000
+# generate point near (1, 1)
+x1_label0 = np.random.normal(1, 1, (5, 1))
+x2_label0 = np.random.normal(1, 1, (5, 1))
 
-def sigmoid(x): # helper  calculate sigmoid
-    return 1. / (1. + np.exp(-x))
+# generate point near (5, 4)
+x1_label1 = np.random.normal(5, 1, (5, 1))
+x2_label1 = np.random.normal(4, 1, (5, 1))
 
-# 1st gang, 1st cluster, around (3, 2) 
-x1_label1 = np.random.normal(3, 1, 1000) # latitude
-x2_label1 = np.random.normal(2, 1, 1000) # longitude
-
-# 2nd gang, 2nd cluster, around (7, 6) 
-x1_label2 = np.random.normal(7, 1, 1000) # latitude
-x2_label2 = np.random.normal(6, 1, 1000) # longitude
-
-x1s = np.append(x1_label1, x1_label2)
-x2s = np.append(x2_label1, x2_label2)
-
-# define classification
-# label1 = 0
-# label2 = 1
-ys = np.asarray([0.] * len(x1_label1) + [1.] * len(x1_label2))
+# generate point near (1, 1)
+x1_label2 = np.random.normal(8, 1, (5, 1))
+x2_label2 = np.random.normal(0, 1, (5, 1))
 
 # show cluster
-plt.plot(x1_label1, x2_label1, 'g++')
-plt.plot(x1_label2, x2_label2, 'b+')
-plt.show()
+plt.scatter(x1_label0, x2_label0, c='r', marker='o', s=60)
+plt.scatter(x1_label1, x2_label1, c='g', marker='x', s=60)
+plt.scatter(x1_label2, x2_label2, c='b', marker='+', s=60)
 
-X1 = tf.placeholder(tf.float32, shape=(None,), name="x1")
-X2 = tf.placeholder(tf.float32, shape=(None,), name="x2")
-Y = tf.placeholder(tf.float32, shape=(None,), name="y")
-w = tf.Variable([0., 0., 0.], name="w", trainable=True)
+xs_label0 = np.hstack((x1_label0, x2_label0))
+xs_label1 = np.hstack((x1_label1, x2_label1))
+xs_label2 = np.hstack((x1_label2, x2_label2))
+xs = np.vstack((xs_label0, xs_label1, xs_label2))
 
-def model(X2, X1, w):  # sigmoid model
-    return tf.div(
-        1.,
-        tf.add(1., tf.exp(-1 * (w[2] * X2 + w[1] * X1 + w[0])),
-    ))
+# define classification
+# label0 = [1, 0, 0]
+# label1 = [0, 1, 0]
+# label2 = [0, 0, 1]
+labels = np.matrix(
+    [[1., 0., 0.]] * len(x1_label0) +
+    [[0., 1., 0.]] * len(x1_label1) +
+    [[0., 0., 1.]] * len(x1_label2)
+)
 
-y_model = model(X2, X1, w)
+# start shuffle data
+arr = np.arange(xs.shape[0]) # work just like linespace
+np.random.shuffle(arr)
 
-cost = tf.reduce_mean(-Y * tf.log(y_model) - (1 - Y) * tf.log(1 - y_model))
+xs = xs[arr]
+labels = labels[arr]
+
+# create test dataset
+test_x1_label0 = np.random.normal(1, 1, (10, 1))
+test_x2_label0 = np.random.normal(1, 1, (10, 1))
+test_x1_label1 = np.random.normal(5, 1, (10, 1))
+test_x2_label1 = np.random.normal(4, 1, (10, 1))
+test_x1_label2 = np.random.normal(8, 1, (10, 1))
+test_x2_label2 = np.random.normal(0, 1, (10, 1))
+test_xs_label0 = np.hstack((test_x1_label0, test_x2_label0))
+test_xs_label1 = np.hstack((test_x1_label1, test_x2_label1))
+test_xs_label2 = np.hstack((test_x1_label2, test_x2_label2))
+test_xs = np.vstack((test_xs_label0, test_xs_label1, test_xs_label2))
+test_labels = np.matrix(
+    [[1., 0., 0.]] * len(test_x1_label0) +
+    [[0., 1., 0.]] * len(test_x1_label1) +
+    [[0., 0., 1.]] * len(test_x1_label2)
+)
+
+# num_features = number of dimension
+# train size = training dataset size
+train_size, num_features = xs.shape
+print(f"Train size   = {train_size}")
+print(f"Num features = {num_features}")
+
+learning_rate = 0.01
+training_epochs = 1000
+num_labels = 3
+batch_size = 100
+
+X = tf.placeholder("float", shape=[None, num_features])
+Y = tf.placeholder("float", shape=[None, num_labels])
+
+W = tf.Variable(tf.ones([num_features, num_labels]))
+b = tf.Variable(tf.ones([num_labels]))
+
+def model(X, W, b):
+    reduce_dimension = 1
+    logits = tf.add(tf.matmul(X, W), b)
+    sum_logits = tf.matmul(
+        tf.expand_dims(tf.reduce_sum(tf.exp(logits), reduce_dimension), reduce_dimension),
+        tf.ones([reduce_dimension, num_labels])
+    )
+    return tf.divide(tf.exp(logits), sum_logits)
+
+y_model = model(X, W, b)
+# y_model = tf.nn.softmax(tf.add(tf.matmul(X, W), b))
+
+cost = -tf.reduce_sum(Y * tf.log(y_model))
 train_op = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
+
+correct_prediction = tf.equal(tf.argmax(y_model, 1), tf.argmax(Y, 1))
+accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 
 sess = tf.Session()
 init = tf.global_variables_initializer()
 sess.run(init)
 
-prev_err = 0
-for epoch in range(training_epochs):
-    err, _ = sess.run([cost, train_op], feed_dict={X1: x1s, X2: x2s, Y: ys})
+print("========== DIVIDE")
+print(sess.run(model(X, W, b), feed_dict={X: xs}))
+print("========== COMPARE")
+print(sess.run(tf.nn.softmax(tf.add(tf.matmul(X, W), b)), feed_dict={X: xs}))
 
-    if abs(prev_err - err) < 0.0001: 
-        break
-    prev_err = err
+# # calculate total number of batch, feed a single batch per train
+# total_batch = training_epochs * train_size // batch_size
+# for step in range(total_batch):
+#     offset = (step * batch_size) % train_size
+#     batch_xs = xs[offset:(offset + batch_size)]
+#     batch_labels = labels[offset:(offset + batch_size)]
+#     err, _ = sess.run([cost, train_op], feed_dict={X: batch_xs, Y: batch_labels})
+#     # print(step, err)
 
-w_val = sess.run(w)
+# W_val = sess.run(W)
+# print(f"W Val = {W_val}")
+# b_val = sess.run(b)
+# print(f"b Val = {b_val}")
 
-sess.close()
+# print("accuracy", sess.run(accuracy, feed_dict={X: test_xs, Y: test_labels}))
+# print(sess.run(correct_prediction, feed_dict={X: test_xs, Y: test_labels}))
 
-print("===== DONE TRAINING =====")
-
-# problem output
-print(f"Crime probability: {sigmoid(4 * w_val[2] + 6 * w_val[1] + w_val[0])}")
-
-x1_crime_long_4, x2_crime_long_4 = [], []
-for x1 in x1s:
-    for x2 in x2s:
-        z = sigmoid(x2 * w_val[2] + x1 * w_val[1] + w_val[0])
-        if abs(z - 0.5) < 0.01:
-            x1_crime_long_4.append(x1)
-            x2_crime_long_4.append(x2)
-
-plt.plot(x1_label1, x2_label1, 'g+')
-plt.plot(x1_label2, x2_label2, 'b+')
-plt.plot(x1_crime_long_4, x2_crime_long_4, 'r+')
-plt.savefig('2d_crime.png')
+# print(sess.run(tf.argmax(y_model, 1), feed_dict={X: [[5, 4]]}))
