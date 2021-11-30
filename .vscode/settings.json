@@ -3,5 +3,8 @@
     "cSpell.words": [
         "dtype",
         "NVML"
-    ]
+    ],
+    "files.watcherExclude": {
+        "**/target": true
+    }
 }
