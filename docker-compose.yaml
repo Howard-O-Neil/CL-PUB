@@ -46,6 +46,7 @@ services:
     volumes:
       - ./requirement.txt:/home/howard/collaborative-recommender/requirement.txt:rw
       - ./src:/home/howard/collaborative-recommender/src:rw
+      - ./data:/home/howard/collaborative-recommender/data:rw
       - ./notebook:/home/howard/collaborative-recommender/notebook:rw
       - ./container_share.log:/home/howard/container_share.log:rw
     # runtime: nvidia

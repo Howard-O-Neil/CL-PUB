@@ -1,0 +1,29 @@
+Bregman Music and Audio Python Toolkit
+
+You will need to run the setup.py script as administrator. E.g.:
+
+sudo python setup.py install
+
+This will place Bregman in your Python distribution path.
+
+See README for details on how to use Bregman
+
+-MC 16.07.14
+
+Dependencies:
+
+ setuptools
+ python-dev
+
+ python 2.5+
+ numpy
+ matplotlib
+ scipy
+
+ optional:
+  scikits.audiolab
+  libsndfile-dev
+
+
+
+
