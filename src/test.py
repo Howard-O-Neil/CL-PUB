@@ -1,8 +1,12 @@
-# using asterisk
-def food(**kwargs):
-  for items in kwargs:
-    print(f"{kwargs[items]} is a {items}")
-      
-dict = {'fruit' : 'cherry', 'vegetable' : 'potato', 'boy' : 'srikrishna'}
-# using asterisk
-food(**dict)
+import tensorflow_core as tf
+import matplotlib.pyplot as plt
+import numpy as np
+
+sess = tf.Session()
+init = tf.global_variables_initializer()
+sess.run(init)
+
+a = tf.constant([1., 2.])
+b = tf.constant([3., 4.])
+
+print(sess.run(tf.sqrt(tf.square(tf.subtract(a, b)))))

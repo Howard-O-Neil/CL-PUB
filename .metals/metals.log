@@ -1,0 +1,5 @@
+[0m2021.11.30 18:15:34 INFO  Started: Metals version 0.10.9 in workspace '/home/howard/project/collaborative-recommender/basic-ML-Tensorflow' for client Visual Studio Code 1.61.2.[0m
+[0m2021.11.30 18:15:36 INFO  time: initialize in 2.31s[0m
+[0m2021.11.30 18:15:37 WARN  Build server is not auto-connectable.[0m
+[0m2021.11.30 18:15:37 WARN  no build tool detected in workspace '/home/howard/project/collaborative-recommender/basic-ML-Tensorflow'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. [0m
+[0m2021.12.01 13:31:43 INFO  shutting down Metals[0m
