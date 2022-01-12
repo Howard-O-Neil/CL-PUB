@@ -165,3 +165,5 @@ for i in range(max_training_epochs):
     print(variance)
     if variance <= neurons_diff_stop_cond:
         break
+
+np.as np.float32
