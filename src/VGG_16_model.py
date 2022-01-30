@@ -1,7 +1,7 @@
 import tensorflow_core as tf
 import numpy as np
-import network_components as nc
-import model_hyper_params as mhp
+import model.network_components as nc
+import model.model_hyper_params as mhp
 
 # VGG-16 model made gor grayscale images
 class VGG_16:
@@ -56,7 +56,7 @@ class VGG_16:
 
         for i in range(0, mhp.num_dense_layers):
             
-            fan_in = 7 * 7 * mhp.num_filters[12]
+            fan_in = 7 * 7 * mhp.num_filters[-1]
             if i > 0: fan_in = mhp.num_dense_neurons[i - 1]
 
             fan_out = mhp.num_dense_neurons[i]
