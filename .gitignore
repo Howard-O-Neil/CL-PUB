@@ -11,4 +11,5 @@
 **/.metals
 **/__pycache__
 **/data
+**/image
 **.py.bak
