@@ -1,12 +1,13 @@
 import sys
 
-sys.path.append("..")
+sys.path.append("../..")
 
 from pprint import pprint
 import tensorflow_datasets as tfds
 import tensorflow_recommenders as tfrs
 import tensorflow as tf
-import tensorflow.keras as keras
+import keras
+
 import numpy as np
 
 from model.movielen_model import MovieLensModel
@@ -31,6 +32,7 @@ ratings = tfds.load("movielens/100k-ratings", split="train")
 
 movies = tfds.load("movielens/100k-movies", split="train")
 
+
 # Select basic features
 ratings = ratings.map(
     lambda x: {"movie_title": x["movie_title"], "user_id": x["user_id"]}
@@ -53,43 +55,37 @@ print(unique_movie_titles[0])
 str_lookup = keras.layers.StringLookup(vocabulary=unique_movie_titles, mask_token=None)
 embed = keras.layers.Embedding(10, 32)
 
+print(str_lookup(unique_movie_titles[10:11]).numpy())
 print(embed(str_lookup(unique_movie_titles[0:2])).shape)
-# # query tower
-# user_model = create_embedding_model(unique_user_ids)
 
-# # candidate tower
-# movie_model = create_embedding_model(unique_movie_titles)
+# query tower
+user_model = create_embedding_model(unique_user_ids)
 
-# print(f"User params  : {user_model(unique_user_ids).shape}")
-# print(f"Movie params : {movie_model(unique_movie_titles).shape}")
+# candidate tower
+movie_model = create_embedding_model(unique_movie_titles)
 
-# task = tfrs.tasks.Retrieval(
-#     metrics=tfrs.metrics.FactorizedTopK(
-#         candidates=movies.batch(128).map(movie_model)
-#     )
-# )
+print(f"User params  : {user_model(unique_user_ids).shape}")
+print(f"Movie params : {movie_model(unique_movie_titles).shape}")
 
+task = tfrs.tasks.Retrieval(
+    metrics=tfrs.metrics.FactorizedTopK(
+        candidates=movies.batch(128).map(movie_model)
+    )
+)
 
-# print(metrics)
+# Create a retrieval model.
+model = MovieLensModel(user_model, movie_model, task)
+model.compile(optimizer=keras.optimizers.Adagrad(0.5))
 
-# # Define your objectives.
-# task = tfrs.tasks.Retrieval(
-#     metrics=tfrs.metrics.FactorizedTopK(movies.batch(128).map(movie_model))
-# )
+# Train.
+model.fit(ratings.batch(4096), epochs=3)
 
-# # Create a retrieval model.
-# model = MovieLensModel(user_model, movie_model, task)
-# model.compile(optimizer=keras.optimizers.Adagrad(0.5))
+# Set up retrieval using trained representations.
+index = tfrs.layers.ann.BruteForce(model.user_model)
+index.index_from_dataset(
+    movies.batch(100).map(lambda title: (title, model.movie_model(title)))
+)
 
-# # Train.
-# model.fit(ratings.batch(4096), epochs=3)
-
-# # Set up retrieval using trained representations.
-# index = tfrs.layers.ann.BruteForce(model.user_model)
-# index.index_from_dataset(
-#     movies.batch(100).map(lambda title: (title, model.movie_model(title)))
-# )
-
-# # Get recommendations.
-# _, titles = index(np.array(["42"]))
-# print(f"Recommendations for user 42: {titles[0, :3]}")
+# Get recommendations.
+_, titles = index(np.array(["42"]))
+print(f"Recommendations for user 42: {titles[0, :3]}")
