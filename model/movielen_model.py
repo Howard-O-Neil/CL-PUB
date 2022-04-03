@@ -33,9 +33,12 @@ class MovieLensModel(tfrs.Model):
 
         user_embeddings = self.user_model(features["user_id"])
         movie_embeddings = self.movie_model(features["movie_title"])
-        
+
+        movie_ids = features["movie_id"]
+
         return self.task(
             query_embeddings=user_embeddings,
             candidate_embeddings=movie_embeddings,
+            candidate_ids=movie_ids,
             compute_metrics=self.compute_metrics,
         )

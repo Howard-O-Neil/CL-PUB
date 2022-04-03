@@ -129,10 +129,12 @@ def compute_metrics(num_users, num_candidates):
     for metric in task.factorized_metrics._top_k_metrics:
         update_ops.append(metric.update_state(y_true=y_true, y_pred=y_pred))
 
+    top_k = [1, 5, 10, 50, 100]
     for idx, metric in enumerate(task.factorized_metrics._top_k_metrics):
-        print(f"Top {idx + 1} accuracy: {metric.result()}")
+        print(f"Top {top_k[idx]} accuracy: {metric.result()}")
 
-def train():
+
+def train(num_epochs):
     model = MovieLensModel(user_model, movie_model, task, False)
     model.compile(optimizer=keras.optimizers.Adagrad(0.5))
 
@@ -140,9 +142,14 @@ def train():
 
     model.fit(
         ratings.map(
-            lambda x: {"user_id": x["user_id"], "movie_title": x["movie_title"]}
+            lambda x: {
+                "user_id": x["user_id"],
+                "movie_title": x["movie_title"],
+                "movie_id": x["movie_id"],
+            }
         ).batch(4096),
-        epochs=1,
+        epochs=num_epochs,
     )
 
+train(10)
 compute_metrics(movies.cardinality().numpy(), movies.cardinality().numpy())
