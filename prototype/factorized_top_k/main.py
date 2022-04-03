@@ -33,36 +33,39 @@ def convert_to_numpy(dataset):
 ratings = tfds.load("movielens/100k-ratings", split="train")
 
 movies = tfds.load("movielens/100k-movies", split="train").map(
-    lambda x: x["movie_title"]
+    lambda x: {"movie_id": x["movie_id"], "movie_title": x["movie_title"]}
 )
 
 # Select basic features
-ratings = ratings.map(
-    lambda x: {"movie_title": x["movie_title"], "user_id": x["user_id"]}
-)
 gt_users = ratings.map(lambda x: x["user_id"])
-gt_movies = ratings.map(lambda x: x["movie_title"])
+gt_movies = ratings.map(
+    lambda x: {"movie_id": x["movie_id"], "movie_title": x["movie_title"]}
+)
 
 # query tower
 unique_user_ids = np.unique(convert_to_numpy(gt_users))
 user_model = create_embedding_model(unique_user_ids)
 
 # candidate tower
-unique_movie_titles = np.unique(convert_to_numpy(gt_movies))
+unique_movie_titles = np.unique(
+    convert_to_numpy(movies.map(lambda x: x["movie_title"]))
+)
 movie_model = create_embedding_model(unique_movie_titles)
 
-k = 100 # top 100 most relevant candidates
-
-query_embeddings = user_model(convert_to_numpy(gt_users.take(10)))
-true_candidate_embeddings = movie_model(convert_to_numpy(gt_movies.take(10)))
+k = 100  # top 100 most relevant candidates
 
 task = tfrs.tasks.Retrieval(
     metrics=tfrs.metrics.FactorizedTopK(
-        candidates=movies.batch(128).map(lambda x: movie_model(x))
+        candidates=movies.batch(128).map(
+            lambda x: (x["movie_id"], movie_model(x["movie_title"]))
+        )
     )
 )
 
-def compare_metrics_after_train():
+
+def compare_metrics_after_train(num_users):
+    query_embeddings = user_model(convert_to_numpy(gt_users.take(num_users)))
+
     test_embed_dataset = movies.take(1).map(lambda x: movie_model(x))
 
     print("===== Before training...")
@@ -90,26 +93,56 @@ def compare_metrics_after_train():
     print(task.factorized_metrics.result())
 
 
-# "*" is not matmul, this is just each query multiply with its equivalent candidate
-#       there can be duplicated user or candidate
-# keepdims = keep the original dimensions
-positive_scores = tf.reduce_sum(
-    query_embeddings * true_candidate_embeddings, axis=1, keepdims=True
-)
+def compute_metrics(num_users, num_candidates):
+    query_embeddings = user_model(convert_to_numpy(gt_users.take(num_users)))
+    true_candidate_embeddings = movie_model(
+        convert_to_numpy(gt_movies.map(lambda x: x["movie_title"]).take(num_candidates))
+    )
+    candidate_ids = np.expand_dims(
+        convert_to_numpy(gt_movies.map(lambda x: x["movie_id"]).take(num_candidates)),
+        axis=1,
+    )
 
-top_k_predictions, ids = task.factorized_metrics._candidates(query_embeddings, k=k)
+    # "*" is not matmul, this is just each query multiply with its equivalent candidate
+    #       there can be duplicated user or candidate
+    # keepdims = keep the original dimensions
+    positive_scores = tf.reduce_sum(
+        query_embeddings * true_candidate_embeddings, axis=1, keepdims=True
+    )
 
-# label positive as 1
-# label top K as zeros
+    top_k_predictions, ids = task.factorized_metrics._candidates.query_with_exclusions(
+        query_embeddings, k=k, exclusions=tf.convert_to_tensor(candidate_ids)
+    )
 
-y_true = tf.concat(
-    [tf.ones(tf.shape(positive_scores)), tf.zeros_like(top_k_predictions)], axis=1
-)
-y_pred = tf.concat([positive_scores, top_k_predictions], axis=1)
+    print("=== Top predictions...")
+    print(top_k_predictions)
+    print(ids)
+    # label positive as 1
+    # label top K as zeros
 
-update_ops = []
-for metric in task.factorized_metrics._top_k_metrics:
-    update_ops.append(metric.update_state(y_true=y_true, y_pred=y_pred))
+    y_true = tf.concat(
+        [tf.ones(tf.shape(positive_scores)), tf.zeros_like(top_k_predictions)], axis=1
+    )
+    y_pred = tf.concat([positive_scores, top_k_predictions], axis=1)
 
-for idx, metric in enumerate(task.factorized_metrics._top_k_metrics):
-    print(f"Top {idx + 1} accuracy: {metric.result()}")
+    update_ops = []
+    for metric in task.factorized_metrics._top_k_metrics:
+        update_ops.append(metric.update_state(y_true=y_true, y_pred=y_pred))
+
+    for idx, metric in enumerate(task.factorized_metrics._top_k_metrics):
+        print(f"Top {idx + 1} accuracy: {metric.result()}")
+
+def train():
+    model = MovieLensModel(user_model, movie_model, task, False)
+    model.compile(optimizer=keras.optimizers.Adagrad(0.5))
+
+    # Train
+
+    model.fit(
+        ratings.map(
+            lambda x: {"user_id": x["user_id"], "movie_title": x["movie_title"]}
+        ).batch(4096),
+        epochs=1,
+    )
+
+compute_metrics(movies.cardinality().numpy(), movies.cardinality().numpy())
