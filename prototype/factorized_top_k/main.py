@@ -151,5 +151,43 @@ def train(num_epochs):
         epochs=num_epochs,
     )
 
-train(10)
+
+train(1)
+
 compute_metrics(movies.cardinality().numpy(), movies.cardinality().numpy())
+
+# Concat the dataset into big vector, then find the top-k
+def brute_force():
+    brute = tfrs.layers.factorized_top_k.BruteForce().index_from_dataset(
+        tf.data.Dataset.zip(
+            (
+                movies.map(lambda x: x["movie_id"]).batch(100),
+                movies.map(lambda x: movie_model(x["movie_title"])).batch(100),
+            )
+        )
+    )
+
+    # Get top 10 recommendations.
+    user_embedding = user_model(tf.convert_to_tensor(["42", "43"]))
+    _, ids = brute(user_embedding, k=10)
+    print(ids)
+
+# Calculate top-k on each batch, then reduce each batch's top-k into 1 result
+# The same things as computing metrics
+def streaming():
+    stream = tfrs.layers.factorized_top_k.Streaming().index_from_dataset(
+        tf.data.Dataset.zip(
+            (
+                movies.map(lambda x: x["movie_id"]).batch(100),
+                movies.map(lambda x: movie_model(x["movie_title"])).batch(100),
+            )
+        )
+    )
+    # Get top 10 recommendations.
+    user_embedding = user_model(tf.convert_to_tensor(["42", "43"]))
+    _, ids = stream(user_embedding, k=10)
+    print(ids)
+
+# produce same results
+brute_force()
+streaming()
