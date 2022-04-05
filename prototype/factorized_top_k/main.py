@@ -151,7 +151,6 @@ def train(num_epochs):
         epochs=num_epochs,
     )
 
-
 train(1)
 
 compute_metrics(movies.cardinality().numpy(), movies.cardinality().numpy())
@@ -189,5 +188,6 @@ def streaming():
     print(ids)
 
 # produce same results
+# both is not efficient at scale, but the 2nd approach is better for memory
 brute_force()
 streaming()
