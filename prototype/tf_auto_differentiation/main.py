@@ -20,7 +20,7 @@ def simple_linear():
 def weight_bias():
     w = tf.Variable(tf.random.normal((3, 2)), name="w")
     b = tf.Variable(tf.zeros(2, dtype=tf.float32), name="b")
-
+    
     x = tf.convert_to_tensor([[1., 2., 3.]])
 
     with tf.GradientTape() as tape:

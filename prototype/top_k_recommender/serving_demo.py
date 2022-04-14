@@ -28,6 +28,23 @@ def create_embedding_model(data, embedding_dimension=32):
 def convert_to_numpy(dataset):
     return np.asarray(list(dataset.as_numpy_iterator()))
 
+def get_interaction_list(ratings, user_ids):
+    res_dict = {}
+    for id in user_ids:
+        res_dict[id] = []
+
+    for rating in list(ratings):
+        uid         = rating["user_id"].numpy().decode("utf-8")
+        mov_id      = rating["movie_id"].numpy().decode("utf-8")
+        mov_title   = rating["movie_title"].numpy().decode("utf-8")
+
+        if uid in user_ids:
+            res_dict[uid].append({
+                "id": mov_id,
+                "title": mov_title
+            })
+        
+    return res_dict
 
 # Ratings
 ratings = tfds.load("movielens/100k-ratings", split="train")
@@ -174,14 +191,14 @@ def scann_compute_2():
     print(f"[Elapse time] {end - start}")
 
 
-print("Bruteforce executing ...")
-brute_force()
+# print("Bruteforce executing ...")
+# brute_force()
 
-print("Streaming executing ...")
-streaming()
+# print("Streaming executing ...")
+# streaming()
 
 print("Scann1 executing ...")
 scann_compute_1()
 
-print("Scann2 executing ...")
-scann_compute_2()
+# print("Scann2 executing ...")
+# scann_compute_2()

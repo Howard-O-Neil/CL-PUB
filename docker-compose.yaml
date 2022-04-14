@@ -40,16 +40,26 @@ services:
               capabilities: [gpu]
     entrypoint: ["nvidia-smi"]
 
-  collaborative-recommender:
-    container_name: collaborative-recommender
-    image: mingkhoi/ubuntu-18.04-tensorrt7-tf1.15:version1.0
+  recsys:
+    container_name: recsys
+    # # torch original image
+    # this image suck due to poor C++ supporting
+    # image: pytorch/pytorch:1.11.0-cuda11.3-cudnn8-devel@sha256:9bfcfa72b6b244c1fbfa24864eec97fb29cfafc065999e9a9ba913fa1e690a02
+    
+    # # tensorflow original image
+    # image: tensorflow/tensorflow:2.9.0rc0-gpu@sha256:256e05c30e769cd038afdee4e9f307c5c7c720065520cde8a5aaa98b0619842c
+
+    # add some packages (pytorch, faiss, anaconda3, ...) then commit
+    image: tensorflow/tensorflow:2.9.0rc0-gpu
+
     volumes:
-      - ./requirement.txt:/home/howard/collaborative-recommender/requirement.txt:rw
-      - ./src:/home/howard/collaborative-recommender/src:rw
-      - ./data:/home/howard/collaborative-recommender/data:rw
-      - ./notebook:/home/howard/collaborative-recommender/notebook:rw
-      - ./container_share.log:/home/howard/container_share.log:rw
-    # runtime: nvidia
+      - ./requirement.txt:/recsys/requirement.txt:rw
+      - ./model:/recsys/model:rw
+      - ./prototype:/recsys/prototype:rw
+      - ./data:/recsys/data:rw
+      - ./notebook:/recsys/notebook:rw
+      - ./container_share.log:/recsys/container_share.log:rw
+    runtime: nvidia
     # privileged: true
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
@@ -66,18 +76,18 @@ services:
     # networks:
     #   collaborative-recommender-network:
     #     ipv4_address: 128.0.1.2
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              # count: 1
-              capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           # count: 1
+    #           capabilities: [gpu]
     # entrypoint: ["nvidia-smi"]
-    entrypoint: ["tail", "-f", "/home/howard/container_share.log"]
+    entrypoint: ["tail", "-f", "/recsys/container_share.log"]
 
 networks:
-  collaborative-recommender-network:
+  recsys-network:
     ipam:
       driver: default
       config:

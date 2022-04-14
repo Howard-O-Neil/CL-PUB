@@ -28,7 +28,6 @@ def create_embedding_model(data, embedding_dimension=32):
 def convert_to_numpy(dataset):
     return np.asarray(list(dataset.as_numpy_iterator()))
 
-
 # Ratings
 ratings = tfds.load("movielens/100k-ratings", split="train")
 
@@ -151,7 +150,7 @@ def train(num_epochs):
         epochs=num_epochs,
     )
 
-train(1)
+train(1000)
 
 compute_metrics(movies.cardinality().numpy(), movies.cardinality().numpy())
 
@@ -186,6 +185,26 @@ def streaming():
     user_embedding = user_model(tf.convert_to_tensor(["42", "43"]))
     _, ids = stream(user_embedding, k=10)
     print(ids)
+
+# ScaNN concept
+def _scann():
+    scann = tfrs.layers.factorized_top_k.ScaNN( 
+        num_leaves=1000,
+        num_leaves_to_search=100,
+        num_reordering_candidates=1000).index_from_dataset(
+            tf.data.Dataset.zip(
+                (
+                    movies.map(lambda x: x["movie_id"]).batch(100),
+                    movies.map(lambda x: movie_model(x["movie_title"])).batch(100),
+                )
+            )
+        )
+    user_embedding = user_model(tf.convert_to_tensor(["42", "43"]))
+
+    # initialize after indexing, first time call
+    scann(user_embedding, k=10)
+
+    return scann(user_embedding, k=10)
 
 # produce same results
 # both is not efficient at scale, but the 2nd approach is better for memory

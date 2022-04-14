@@ -1,0 +1,12 @@
+{'bucketized_user_age': <tf.Tensor: shape=(), dtype=float32, numpy=45.0>, 
+    'movie_genres': <tf.Tensor: shape=(1,), dtype=int64, numpy=array([7])>, 
+    'movie_id': <tf.Tensor: shape=(), dtype=string, numpy=b'357'>, 
+    'movie_title': <tf.Tensor: shape=(), dtype=string, numpy=b"One Flew Over the Cuckoo's Nest (1975)">, 
+    'raw_user_age': <tf.Tensor: shape=(), dtype=float32, numpy=46.0>, 
+    'timestamp': <tf.Tensor: shape=(), dtype=int64, numpy=879024327>, 
+    'user_gender': <tf.Tensor: shape=(), dtype=bool, numpy=True>, 
+    'user_id': <tf.Tensor: shape=(), dtype=string, numpy=b'138'>, 
+    'user_occupation_label': <tf.Tensor: shape=(), dtype=int64, numpy=4>, 
+    'user_occupation_text': <tf.Tensor: shape=(), dtype=string, numpy=b'doctor'>, 
+    'user_rating': <tf.Tensor: shape=(), dtype=float32, numpy=4.0>, 
+    'user_zip_code': <tf.Tensor: shape=(), dtype=string, numpy=b'53211'>}
