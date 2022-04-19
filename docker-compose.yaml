@@ -59,7 +59,7 @@ services:
       - ./data:/recsys/data:rw
       - ./notebook:/recsys/notebook:rw
       - ./container_share.log:/recsys/container_share.log:rw
-    runtime: nvidia
+    # runtime: nvidia
     # privileged: true
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
@@ -86,6 +86,9 @@ services:
     # entrypoint: ["nvidia-smi"]
     entrypoint: ["tail", "-f", "/recsys/container_share.log"]
 
+    spark:
+      container_name: spark
+    
 networks:
   recsys-network:
     ipam:
