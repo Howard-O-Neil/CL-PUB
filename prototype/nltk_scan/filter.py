@@ -17,9 +17,14 @@ for i in range(1, 2411):  # from file vocab-0 -> vocab-2410
 
     print(f"Filtered vocab-{i}.txt")
 
+search_dict = {}
+for word in words.words():
+    search_dict[word] = True
+
+# Search in dictionary is much faster than linear list O(1)
 filter_vocab = list(
     filter(
-        lambda x: x in words.words() and print(f"Matched word: {x}"),
+        lambda x: x in search_dict,
         list(set(filter_vocab)),
     )
 )
