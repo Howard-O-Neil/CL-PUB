@@ -82,7 +82,7 @@ task = tfrs.tasks.Retrieval(
 
 import logging
 
-log_dir = "/recsys/prototype/factorized_top_k/compare_annoy.log"
+log_dir = "/recsys/prototype/top_k_recommender/compare_annoy.log"
 logger = logging.getLogger("TRAINING LOG")
 logger.setLevel(logging.DEBUG)
 log_filehandler = logging.FileHandler(filename=log_dir, mode="a")
