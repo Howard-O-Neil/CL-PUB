@@ -17,5 +17,8 @@
 <!-- Put site-specific property overrides in this file. -->
 
 <configuration>
-
+    <property>
+        <name>dfs.disk.balancer.enabled</name>
+        <value>true</value>
+    </property>
 </configuration>

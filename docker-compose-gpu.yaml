@@ -101,14 +101,14 @@ services:
     # build from ubuntu image, add HDFS + corretto8
     image: mingkhoi/recsys-hdfs:fixbug-version1
     ports:
-      - "9000" # default fs
-      - "8020" # default namenode RPC port
-      - "9870"
-      - "9871"
-      - "50100"
-      - "50105"
-      - "9868"
-      - "9869"
+      - "9000"  # NN default fs
+      - "8020"  # NN RPC port
+      - "9870"  # NN http address
+      - "9871"  # NN https address
+      - "50100" # NN backup address
+      - "50105" # NN backup http address
+      - "9868"  # SNN secondary http address
+      - "9869"  # SNN secondary https address
     networks:
       recsys-network:
         ipv4_address: 128.0.5.3
@@ -127,14 +127,14 @@ services:
     # build from ubuntu image, add HDFS + corretto8
     image: mingkhoi/recsys-hdfs:fixbug-version1
     ports:
-      - "9000" # default fs
-      - "8020" # default namenode RPC port
-      - "9870"
-      - "9871"
-      - "50100"
-      - "50105"
-      - "9868"
-      - "9869"
+      - "9000"  # NN default fs
+      - "8020"  # NN RPC port
+      - "9870"  # NN http address
+      - "9871"  # NN https address
+      - "50100" # NN backup address
+      - "50105" # NN backup http address
+      - "9868"  # SNN secondary http address
+      - "9869"  # SNN secondary https address
     networks:
       recsys-network:
         ipv4_address: 128.0.5.4
@@ -153,12 +153,12 @@ services:
     # build from ubuntu image, add HDFS + corretto8
     image: mingkhoi/recsys-hdfs:fixbug-version1
     ports:
-      - "8030"
-      - "8032"
-      - "8031"
-      - "8033"
-      - "8088"
-      - "8090"
+      - "8030" # RM scheduler address
+      - "8032" # RM address
+      - "8031" # RM resource-tracker address
+      - "8033" # RM admin address
+      - "8088" # RM webapp address
+      - "8090" # RM webapp https address
     networks:
       recsys-network:
         ipv4_address: 128.0.5.5
@@ -177,15 +177,15 @@ services:
     # build from ubuntu image, add HDFS + corretto8
     image: mingkhoi/recsys-hdfs:fixbug-version1
     ports:
-      - "9866"
-      - "9864"
-      - "9867"
-      - "9865"
-      - "8040"
-      - "8048"
-      - "8042"
-      - "8044"
-      - "8049"
+      - "9866" # DN address
+      - "9864" # DN http address
+      - "9867" # DN ipc address
+      - "9865" # DN https address
+      - "8040" # NM localizer address
+      - "8048" # NM collector-service address
+      - "8042" # NM webapp address
+      - "8044" # NM webapp https address
+      - "8049" # NM amrmproxy address
     networks:
       recsys-network:
         ipv4_address: 128.0.5.6
@@ -204,15 +204,15 @@ services:
     # build from ubuntu image, add HDFS + corretto8
     image: mingkhoi/recsys-hdfs:fixbug-version1
     ports:
-      - "9866"
-      - "9864"
-      - "9867"
-      - "9865"
-      - "8040"
-      - "8048"
-      - "8042"
-      - "8044"
-      - "8049"
+      - "9866" # DN address
+      - "9864" # DN http address
+      - "9867" # DN ipc address
+      - "9865" # DN https address
+      - "8040" # NM localizer address
+      - "8048" # NM collector-service address
+      - "8042" # NM webapp address
+      - "8044" # NM webapp https address
+      - "8049" # NM amrmproxy address
     networks:
       recsys-network:
         ipv4_address: 128.0.5.7
@@ -231,15 +231,15 @@ services:
     # build from ubuntu image, add HDFS + corretto8
     image: mingkhoi/recsys-hdfs:fixbug-version1
     ports:
-      - "9866"
-      - "9864"
-      - "9867"
-      - "9865"
-      - "8040"
-      - "8048"
-      - "8042"
-      - "8044"
-      - "8049"
+      - "9866" # DN address
+      - "9864" # DN http address
+      - "9867" # DN ipc address
+      - "9865" # DN https address
+      - "8040" # NM localizer address
+      - "8048" # NM collector-service address
+      - "8042" # NM webapp address
+      - "8044" # NM webapp https address
+      - "8049" # NM amrmproxy address
     networks:
       recsys-network:
         ipv4_address: 128.0.5.8
@@ -260,6 +260,19 @@ services:
     networks:
       recsys-network:
         ipv4_address: 128.0.5.9
+    entrypoint: ["tail", "-f", "/dev/null"]
+
+  build-tensor:
+    container_name: build-tensor
+    user: root
+    # ubuntu original image
+    # image: ubuntu:18.04@sha256:512274f1739676880585e70eea6a883db7b6d92841b02647b6c92b478356572c
+
+    # build from ubuntu image, add HDFS + corretto8
+    image: mingkhoi/recsys:fixbug-version1
+    networks:
+      recsys-network:
+        ipv4_address: 128.0.5.10
     entrypoint: ["tail", "-f", "/dev/null"]
 
 networks:
