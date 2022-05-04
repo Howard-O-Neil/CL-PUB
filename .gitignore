@@ -1,3 +1,4 @@
+**/venv
 **/.venv
 **/.venv2
 **/.venv3
@@ -16,3 +17,5 @@
 **/metadata
 **/image
 **.py.bak
+**/*.zip
+/virtual

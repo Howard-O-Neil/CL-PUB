@@ -68,5 +68,13 @@
     <property>
         <name>dfs.disk.balancer.enabled</name>
         <value>true</value>
-    </property>     
+    </property>
+    <property>
+        <name>dfs.http.policy</name>
+        <value>HTTP_ONLY</value>
+    </property>
+    <property>
+        <name>dfs.hosts.exclude</name>
+        <value>/opt/hadoop-3/etc/hadoop/workers_exclude</value>
+    </property>    
 </configuration>

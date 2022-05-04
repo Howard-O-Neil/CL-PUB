@@ -59,6 +59,18 @@
     </property>
     <property>
         <name>yarn.scheduler.maximum-allocation-mb</name>
-        <value>8192</value>
+        <value>4096</value>
     </property>
+    <property>
+        <name>yarn.scheduler.minimum-allocation-vcores</name>
+        <value>1</value>
+    </property>
+    <property>
+        <name>yarn.scheduler.maximum-allocation-vcores</name>
+        <value>3</value>
+    </property>    
+    <property>
+        <name>yarn.http.policy</name>
+        <value>HTTP_ONLY</value>
+    </property>    
 </configuration>
