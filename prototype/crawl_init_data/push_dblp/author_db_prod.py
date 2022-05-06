@@ -46,7 +46,7 @@ spark = SparkSession.builder \
 spark.sql("""
 CREATE TABLE IF NOT EXISTS author (_id LONG, _status INT, _timestamp LONG, id LONG, name STRING, urls ARRAY<STRING>, affiliations ARRAY<STRING>)
     USING PARQUET
-    LOCATION "hdfs://128.0.5.3:9000/data/recsys/tables/author/production/";
+    LOCATION "hdfs://128.0.5.3:9000/data/recsys/dblp/tables/author/production/";
 """)
 
 # spark.sql("""
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS author (_id LONG, _status INT, _timestamp LONG, id LO
 # """).show()
 
 spark.sql("""
-select * from author where name like 'Hatem Boujem%'
+select * from author where name like '%Weing&auml;rtner%'
 """).show()
 
 spark.sql("""

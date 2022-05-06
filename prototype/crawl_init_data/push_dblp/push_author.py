@@ -53,9 +53,9 @@ spark = SparkSession.builder \
 # Int 0 -> normal
 # Int 1 -> deleted
 spark.sql("""
-CREATE TABLE IF NOT EXISTS author (_id LONG, _status INT, _timestamp LONG, id LONG, name STRING, urls ARRAY<STRING>, affiliations ARRAY<STRING>)
+CREATE TABLE IF NOT EXISTS author (_id LONG, _status INT, _timestamp LONG, id LONG, name STRING)
     USING PARQUET
-    LOCATION "hdfs://128.0.5.3:9000/data/recsys/tables/author/production/";
+    LOCATION "hdfs://128.0.5.3:9000/data/recsys/dblp/tables/author/production/";
 """)
 
 source = "/recsys/data/dblp/dblp.xml"

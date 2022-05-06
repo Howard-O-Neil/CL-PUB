@@ -76,16 +76,21 @@ CREATE TABLE IF NOT EXISTS bibtex (
     isbn STRING)
 
     USING PARQUET
-    LOCATION "hdfs://128.0.5.3:9000/data/recsys/tables/bibtex/test/";
+    LOCATION "hdfs://128.0.5.3:9000/data/recsys/dblp/tables/bibtex/test/";
 """)
 
 spark.sql("""
 CREATE TABLE IF NOT EXISTS author (_id LONG, _status INT, _timestamp LONG, id LONG, name STRING, urls ARRAY<STRING>, affiliations ARRAY<STRING>)
     USING PARQUET
-    LOCATION "hdfs://128.0.5.3:9000/data/recsys/tables/author/production/";
+    LOCATION "hdfs://128.0.5.3:9000/data/recsys/dblp/tables/author/production/";
 """)
 
 spark.sql("""
 select count(title) from bibtex
 
+""").show(1000, False)
+
+spark.sql("""
+select title from bibtex
+where title like "Datenschutzerkl%"
 """).show(1000, False)

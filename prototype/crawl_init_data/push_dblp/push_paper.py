@@ -65,19 +65,15 @@ spark.sql("""
 CREATE TABLE IF NOT EXISTS bibtex (
     _id LONG, _status INT, _timestamp LONG, 
     id LONG, 
-    entry STRING, 
-    author ARRAY<LONG>, 
+    entry STRING,
     title STRING,
     year LONG, 
-    month LONG, 
-    url ARRAY<STRING>, 
-    ee ARRAY<STRING>, 
-    address ARRAY<STRING>,
+    month STRING, 
     journal STRING,
     isbn STRING)
 
     USING PARQUET
-    LOCATION "hdfs://128.0.5.3:9000/data/recsys/tables/bibtex/production/";
+    LOCATION "hdfs://128.0.5.3:9000/data/recsys/dblp/tables/bibtex/production/";
 """)
 
 # spark.sql("""
@@ -96,7 +92,7 @@ CREATE TABLE IF NOT EXISTS bibtex (
 spark.sql("""
 CREATE TABLE IF NOT EXISTS author (_id LONG, _status INT, _timestamp LONG, id LONG, name STRING, urls ARRAY<STRING>, affiliations ARRAY<STRING>)
     USING PARQUET
-    LOCATION "hdfs://128.0.5.3:9000/data/recsys/tables/author/production/";
+    LOCATION "hdfs://128.0.5.3:9000/data/recsys/dblp/tables/author/production/";
 """)
 
 spark.sql("""
@@ -234,9 +230,7 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-def insert_bibtex(data, author_map):
-    author_ids = get_author_ids(author_map)
- 
+def insert_bibtex(data, author_map): 
     for cid, chunk in enumerate(chunks(data, 10000)):
         new_id = get_latest_id() + 1
         new_uid = get_latest_uid() + 1
@@ -250,19 +244,15 @@ def insert_bibtex(data, author_map):
 
         for record in chunk:
             entry = handle_double_quote(record['entry'])
-            author = convert_array(list(map(lambda x: author_ids[x], record['author'])), "number")
             title = handle_double_quote(record['title'])
             year = record['year']
-            month = record['month']
-            url = convert_array(record['url'], "string")
-            ee = convert_array(record['ee'], "string")
-            address = convert_array(record['address'], "string")
+            month = handle_double_quote(record['month'])
             journal = handle_double_quote(record['journal'])
             isbn = handle_double_quote(record['isbn'])
 
             composed_insert += f"""       ({new_id}, 0, {int(time.time())}, {new_uid}, \
-                "{entry}", {author}, "{title}", {year}, {month}, \
-                {url}, {ee}, {address}, "{journal}", "{isbn}"),\n""" \
+                "{entry}", "{title}", {year}, "{month}", \
+                "{journal}", "{isbn}"),\n""" \
 
             print(f"[ ===== Checked bibtex: {title} ===== ]")
 
@@ -315,7 +305,7 @@ with open(source, "r") as test_read:
         "author"    : [],
         "title"     : "",
         "year"      : -1,
-        "month"     : -1,
+        "month"     : "",
         "url"       : [],
         "ee"        : [],
         "address"   : [],
@@ -331,7 +321,7 @@ with open(source, "r") as test_read:
             "author"    : [],
             "title"     : "",
             "year"      : -1,
-            "month"     : -1,
+            "month"     : "",
             "url"       : [],
             "ee"        : [],
             "address"   : [],
@@ -398,9 +388,7 @@ with open(source, "r") as test_read:
                     if isinstance(current_data[_t], list):
                         current_data[_t].append(content)
                     elif isinstance(current_data[_t], int):
-                        if content.lower() in month_index:
-                            current_data[_t] = month_index[content.lower()]
-                        else: current_data[_t] = int(content)
+                        current_data[_t] = int(content)
                     elif isinstance(current_data[_t], str):
                         current_data[_t] = content
 

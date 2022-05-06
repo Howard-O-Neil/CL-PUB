@@ -57,7 +57,7 @@ REFRESH TABLE author
 spark.sql("""
 CREATE TABLE IF NOT EXISTS author (_id LONG, _status INT, _timestamp LONG, id STRING, name STRING, urls ARRAY<STRING>, affiliations ARRAY<STRING>)
     USING PARQUET
-    LOCATION "hdfs://128.0.5.3:9000/data/recsys/tables/author/test/";
+    LOCATION "hdfs://128.0.5.3:9000/data/recsys/dblp/tables/author/test/";
 """)
 
 count_id = -1
