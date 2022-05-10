@@ -38,31 +38,7 @@ spark = SparkSession.builder \
     .config("spark.sql.legacy.allowNonEmptyLocationInCTAS", "true") \
     .getOrCreate()
 
-# df = spark.read.option("delimiter", ",") \
-#     .option("header", "true") \
-#     .option("inferSchema", "true") \
-#     .csv("/data/adult_data.csv")
-
-# print("===== Start =====")
-# df.groupby('marital-status').agg({'capital-gain': 'mean'}).show()
-
-# # Int 0 -> normal
-# # Int 1 -> deleted
-# spark.sql("""
-# CREATE TABLE IF NOT EXISTS bibtex (
-#     _id STRING, _status INT, _timestamp LONG, 
-#     id STRING,
-#     title STRING,
-#     year LONG)
-
-#     USING PARQUET
-#     LOCATION "hdfs://128.0.5.3:9000/data/recsys/arnet/tables/bibtex/production/";
-# """)
-
 count_parquet = 0
-
-def handle_double_quote(value):
-    return value.replace('\\"','"').replace('"','\\"')
 
 def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
@@ -96,55 +72,47 @@ with open(source, "r") as test_read:
     def insert_df(dept):
         global count_parquet
 
-        deptSchema = StructType([       
+        deptSchema = StructType([
             StructField('_id', StringType(), False),
             StructField('_status', IntegerType(), False),
             StructField('_timestamp', LongType(), False),
-            StructField('id', StringType(), False),
-            StructField('title', StringType(), False),
-            StructField('year', FloatType(), True),
+            StructField('author_id', StringType(), False),
+            StructField('author_name', StringType(), False),
+            StructField('paper_id', StringType(), False),
+            StructField('paper_title', StringType(), False),
+            StructField('year', FloatType(), False),
         ])
 
         deptDF = spark.createDataFrame(data=dept, schema = deptSchema)
-        deptDF.write.format("parquet").save(f"/data/recsys/arnet/tables/bibtex/production/part-{count_parquet}")
+        deptDF.write.format("parquet").save(f"/data/recsys/arnet/tables/published_history/production/part-{count_parquet}")
         count_parquet += 1
 
     def insert_data(list_data):
+        cached_uuid = {}
+
         for cid, chunk in enumerate(chunks(list_data, INSERT_THRESHOLD)):
 
-            cached_uuid = {}
             composed_data = []
             flag = False
             for record in chunk:
-                if 'title' not in record:
-                    continue
+                uid = str(uuid.uuid1())
 
-                title = handle_double_quote(record['title'])
-                _id = handle_double_quote(record['_id'])
-                
-                year = -1.0
-                if 'year' in record:
-                    year = float(record['year'])
+                composed_data.append((uid, 0, int(time.time()), \
+                    record["author_id"], record["author_name"], \
+                    record["paper_id"], record["paper_title"], record["year"]))
 
-                uid = str(uuid.uuid4())
-                while uid in cached_uuid:
-                    uid = str(uuid.uuid4())
-                cached_uuid[uid] = True
-
-                composed_data.append((uid, 0, int(time.time()), _id, title, year))
-
-                print(f"[ ===== Checked bibtex: {title} ===== ]")
+                print(f"[ ===== Checked Pair Author-Paper: ({record['author_id']}, {record['paper_id']}) ===== ]")
                 flag = True
 
             if flag == False:
-                print(f"[ ===== [Chunk {cid + 1}] NO bibtex Inserted ===== ]")
+                print(f"[ ===== [Chunk {cid + 1}] NO Pair Author-Paper Inserted ===== ]")
                 continue
 
-            print(f"[ ===== [Chunk {cid + 1}] BATCH bibtex Inserting ... ===== ]")
+            print(f"[ ===== [Chunk {cid + 1}] BATCH Pair Author-Paper Inserting ... ===== ]")
 
             insert_df(composed_data)
 
-            print(f"[ ===== [Chunk {cid + 1}] BATCH bibtex Inserted ... ===== ]")
+            print(f"[ ===== [Chunk {cid + 1}] BATCH Pair Author-Paper Inserted ... ===== ]")
 
     # State = 0 -> searching start json
     # State = 1 -> searching end json
@@ -155,9 +123,30 @@ with open(source, "r") as test_read:
         if state == 1:
             if line[0] == "}":
                 data = json.loads(current_json + "}")
-                list_json.append(data)
+                
+                if 'title' in data and '_id' in data:
+                    author_data = {}
+                    if 'authors' in data:
+                        author_data = data['authors']
+                    
+                        year = -1.0
+                        if 'year' in data:
+                            year = float(data['year'])
 
-                print(f"[ ===== Bibtex batch count: {len(list_json)} ===== ]")
+                        for author in author_data:
+                            if 'name' not in author or '_id' not in author:
+                                continue
+
+                            list_json.append({
+                                "_id": "", "_status": 0, "_timestamp": 0,
+                                "author_id"     : author["_id"],
+                                "author_name"   : author["name"],
+                                "paper_id"      : data["_id"],
+                                "paper_title"   : data["title"],
+                                "year"          : year
+                            })
+
+                            print(f"[ ===== Pair Author-Paper batch count: {len(list_json)} ===== ]")
 
                 if len(list_json) >= INSERT_THRESHOLD:
                     insert_data(list_json)
