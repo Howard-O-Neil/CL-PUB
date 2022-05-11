@@ -116,7 +116,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>dependency/</classpathPrefix>
-                            <mainClass>com.graphx.App</mainClass>
+                            <mainClass>graphx.App</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -130,7 +130,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.graphx.App</mainClass>
+                            <mainClass>graphx.App</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -138,21 +138,61 @@
                     </descriptorRefs>
                 </configuration>
             </plugin>
+
+
+            <!-- Some scala -->
+
+            <plugin>
+                <!-- see http://davidb.github.com/scala-maven-plugin -->
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>3.3.2</version>
+                <configuration>
+                    <launchers>
+                        <launcher>
+                            <id>main</id>
+                            <mainClass>graphx.App</mainClass>
+                        </launcher>
+                    </launchers>
+                </configuration>                
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest-maven-plugin</artifactId>
+                <version>2.0.0</version>
+            </plugin>            
         </plugins>
+
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.12.10</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_2.13</artifactId>
+            <artifactId>spark-core_2.12</artifactId>
             <version>3.2.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_2.13</artifactId>
+            <artifactId>spark-sql_2.12</artifactId>
             <version>3.2.0</version>
             <scope>provided</scope>
         </dependency>
@@ -160,7 +200,7 @@
         <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-mllib -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-mllib_2.13</artifactId>
+            <artifactId>spark-mllib_2.12</artifactId>
             <version>3.2.0</version>
             <scope>provided</scope>
         </dependency>
@@ -168,7 +208,7 @@
         <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-streaming_2.13</artifactId>
+            <artifactId>spark-streaming_2.12</artifactId>
             <version>3.2.0</version>
             <scope>provided</scope>
         </dependency>
@@ -176,7 +216,7 @@
         <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-hive -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-hive_2.13</artifactId>
+            <artifactId>spark-hive_2.12</artifactId>
             <version>3.2.0</version>
             <scope>provided</scope>
         </dependency>
@@ -184,7 +224,7 @@
         <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-catalyst -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-catalyst_2.13</artifactId>
+            <artifactId>spark-catalyst_2.12</artifactId>
             <version>3.2.0</version>
             <scope>test</scope>
         </dependency>
@@ -192,21 +232,21 @@
         <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-tags -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-tags_2.13</artifactId>
+            <artifactId>spark-tags_2.12</artifactId>
             <version>3.2.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-graphx -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-graphx_2.13</artifactId>
+            <artifactId>spark-graphx_2.12</artifactId>
             <version>3.2.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-yarn -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-yarn_2.13</artifactId>
+            <artifactId>spark-yarn_2.12</artifactId>
             <version>3.2.0</version>
             <scope>provided</scope>
         </dependency>
