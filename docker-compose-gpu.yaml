@@ -1,0 +1,459 @@
+version: "3.9"
+
+services:
+  # nvidia-container-runtime:
+  #   container_name: nv-con-runtime
+  #   image: nvidia/cuda:11.0-base
+  #   runtime: nvidia
+  #   privileged: true
+
+  #   # devices:
+  #   #   # - /dev:/dev
+  #   #   - /dev/nvidia0:/dev/nvidia0
+  #   #   - /dev/nvidiactl:/dev/nvidiactl
+  #   #   - /dev/nvidia-caps:/dev/nvidia-caps
+  #   #   - /dev/nvidia-modeset:/dev/nvidia-modeset
+  #   #   - /dev/nvidia-uvm:/dev/nvidia-uvm
+  #   #   - /dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools
+  #   entrypoint: ["echo", "Service disabled"]
+
+  # nvidia-container-toolkit:
+  #   container_name: nv-con-toolkit
+  #   image: nvidia/cuda:11.0-base
+  #   # privileged: true
+
+  #   devices:
+  #     # - /dev:/dev
+  #     - /dev/nvidia0:/dev/nvidia0
+  #     - /dev/nvidiactl:/dev/nvidiactl
+  #     - /dev/nvidia-caps:/dev/nvidia-caps
+  #     - /dev/nvidia-modeset:/dev/nvidia-modeset
+  #     - /dev/nvidia-uvm:/dev/nvidia-uvm
+  #     - /dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools
+
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1 # equivalent for gpus = 1, if this is not set, gpus = all
+  #             capabilities: [gpu]
+  #   entrypoint: ["echo", "Service disabled"]
+
+  # Support dns lookup, from hostname down to ip address
+  # docker-proxy-dns:
+  #   image: defreitas/dns-proxy-server
+  #   hostname: docker-proxy-dns
+  #   container_name: docker-proxy-dns
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - /etc/resolv.conf:/etc/resolv.conf
+  
+  recsys-server1:
+
+    container_name: recsys-server1
+    hostname: recsys-server1
+    # # torch original image
+    # this image suck due to poor C++ supporting
+    # image: pytorch/pytorch:1.11.0-cuda11.3-cudnn8-devel@sha256:9bfcfa72b6b244c1fbfa24864eec97fb29cfafc065999e9a9ba913fa1e690a02
+
+    # # tensorflow original image
+    # image: tensorflow/tensorflow:2.9.0rc0-gpu@sha256:256e05c30e769cd038afdee4e9f307c5c7c720065520cde8a5aaa98b0619842c
+
+    # build from tensorflow image, add some packages, spark + corretto8 + rapids
+    image: mingkhoi/recsys:fixbug-version1
+    volumes:
+      - ./requirement.txt:/recsys/requirement.txt:rw
+      - ./model:/recsys/model:rw
+      - ./prototype:/recsys/prototype:rw
+      - ./data:/recsys/data:rw
+      - ./notebook:/recsys/notebook:rw
+
+    # runtime: nvidia
+    # privileged: true
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    devices:
+      # - /dev:/dev
+      - /dev/nvidia0:/dev/nvidia0
+      - /dev/nvidiactl:/dev/nvidiactl
+      - /dev/nvidia-caps:/dev/nvidia-caps
+      - /dev/nvidia-modeset:/dev/nvidia-modeset
+      - /dev/nvidia-uvm:/dev/nvidia-uvm
+      - /dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools
+    # network_mode: "host"
+    ports:
+      - "8080"
+      - "8081"
+      - "18080"
+      - "7077"
+      - "6066"
+      - "7337"
+      - "4040"
+    networks:
+      recsys-network:
+        ipv4_address: 128.0.5.2
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              # count: 1
+              capabilities: [gpu]
+    # entrypoint: ["nvidia-smi"]
+    # entrypoint: ["tail", "-f", "/recsys/container_share.log"]
+    entrypoint: ["tail", "-f", "/dev/null"]
+
+  spark-master1:
+
+    container_name: recsys-sparkmaster1
+    hostname: recsys-sparkmaster1
+    user: hadoop
+    # ubuntu original image
+    # image: ubuntu:18.04@sha256:512274f1739676880585e70eea6a883db7b6d92841b02647b6c92b478356572c
+
+    # build from ubuntu image, add HDFS + corretto8
+    image: mingkhoi/recsys-hdfs:fixbug-version1
+    ports:
+      - "7077" # SPARK master port  
+      - "8080" # SPARK master web ui
+    networks:
+      recsys-network:
+        ipv4_address: 128.0.5.11
+    volumes:
+      - /virtual/data/recsys/metadata/spark/master1:/home/hadoop/spark:rw
+      - ./entry.sh:/entry.sh:rw
+      - ./config/spark/master1:/opt/spark/conf:rw
+    entrypoint: ["/bin/sh", "-c", "/entry.sh"]
+
+  spark-worker1:
+
+    container_name: recsys-sparkworker1
+    hostname: recsys-sparkworker1
+    user: hadoop
+    # ubuntu original image
+    # image: ubuntu:18.04@sha256:512274f1739676880585e70eea6a883db7b6d92841b02647b6c92b478356572c
+
+    # build from ubuntu image, add HDFS + corretto8
+    image: mingkhoi/recsys-hdfs:fixbug-version1
+    ports:
+      - "8081" # SPARK worker web ui
+    networks:
+      recsys-network:
+        ipv4_address: 128.0.5.12
+    volumes:
+      - /virtual/data/recsys/metadata/spark/worker1:/home/hadoop/spark:rw
+      - ./entry.sh:/entry.sh:rw
+      - ./config/spark/worker1:/opt/spark/conf:rw
+    entrypoint: ["/bin/sh", "-c", "/entry.sh"]
+
+  spark-worker2:
+
+    container_name: recsys-sparkworker2
+    hostname: recsys-sparkworker2
+    user: hadoop
+    # ubuntu original image
+    # image: ubuntu:18.04@sha256:512274f1739676880585e70eea6a883db7b6d92841b02647b6c92b478356572c
+
+    # build from ubuntu image, add HDFS + corretto8
+    image: mingkhoi/recsys-hdfs:fixbug-version1
+    ports:
+      - "8081" # SPARK worker web ui
+    networks:
+      recsys-network:
+        ipv4_address: 128.0.5.13
+    volumes:
+      - /virtual/data/recsys/metadata/spark/worker2:/home/hadoop/spark:rw
+      - ./entry.sh:/entry.sh:rw
+      - ./config/spark/worker2:/opt/spark/conf:rw
+    entrypoint: ["/bin/sh", "-c", "/entry.sh"]
+
+  spark-worker3:
+
+    container_name: recsys-sparkworker3
+    hostname: recsys-sparkworker3
+    user: hadoop
+    # ubuntu original image
+    # image: ubuntu:18.04@sha256:512274f1739676880585e70eea6a883db7b6d92841b02647b6c92b478356572c
+
+    # build from ubuntu image, add HDFS + corretto8
+    image: mingkhoi/recsys-hdfs:fixbug-version1
+    ports:
+      - "8081" # SPARK worker web ui
+    networks:
+      recsys-network:
+        ipv4_address: 128.0.5.16
+    volumes:
+      - /virtual/data/recsys/metadata/spark/worker3:/home/hadoop/spark:rw
+      - ./entry.sh:/entry.sh:rw
+      - ./config/spark/worker3:/opt/spark/conf:rw
+    entrypoint: ["/bin/sh", "-c", "/entry.sh"]
+
+  hdfs-namenode1:
+
+    container_name: recsys-namenode1
+    hostname: recsys-namenode1
+    user: hadoop
+    # ubuntu original image
+    # image: ubuntu:18.04@sha256:512274f1739676880585e70eea6a883db7b6d92841b02647b6c92b478356572c
+
+    # build from ubuntu image, add HDFS + corretto8
+    image: mingkhoi/recsys-hdfs:fixbug-version1
+    ports:
+      - "9000"  # NN default fs
+      - "8020"  # NN RPC port
+      - "9870"  # NN http address
+      - "9871"  # NN https address
+      - "50100" # NN backup address
+      - "50105" # NN backup http address
+      - "9868"  # SNN secondary http address
+      - "9869"  # SNN secondary https address
+    networks:
+      recsys-network:
+        ipv4_address: 128.0.5.3
+    volumes:
+      - /virtual/data/recsys/metadata/hdfs/namenode1:/home/hadoop/hdfs:rw
+      - ./entry.sh:/entry.sh:rw
+      - ./config/hdfs/namenode1:/opt/hadoop-3/etc/hadoop:rw
+    entrypoint: ["/bin/sh", "-c", "/entry.sh"]
+
+  hdfs-namenode2:
+
+    container_name: recsys-namenode2
+    hostname: recsys-namenode2
+    user: hadoop
+    # ubuntu original image
+    # image: ubuntu:18.04@sha256:512274f1739676880585e70eea6a883db7b6d92841b02647b6c92b478356572c
+
+    # build from ubuntu image, add HDFS + corretto8
+    image: mingkhoi/recsys-hdfs:fixbug-version1
+    ports:
+      - "9000"  # NN default fs
+      - "8020"  # NN RPC port
+      - "9870"  # NN http address
+      - "9871"  # NN https address
+      - "50100" # NN backup address
+      - "50105" # NN backup http address
+      - "9868"  # SNN secondary http address
+      - "9869"  # SNN secondary https address
+    networks:
+      recsys-network:
+        ipv4_address: 128.0.5.4
+    volumes:
+      - /virtual/data/recsys/metadata/hdfs/namenode2:/home/hadoop/hdfs:rw
+      - ./entry.sh:/entry.sh:rw
+      - ./config/hdfs/namenode2:/opt/hadoop-3/etc/hadoop:rw
+    entrypoint: ["/bin/sh", "-c", "/entry.sh"]
+
+  hdfs-resourcemanager:
+
+    container_name: recsys-resourcemanager
+    hostname: recsys-resourcemanager
+    user: hadoop
+    # ubuntu original image
+    # image: ubuntu:18.04@sha256:512274f1739676880585e70eea6a883db7b6d92841b02647b6c92b478356572c
+
+    # build from ubuntu image, add HDFS + corretto8
+    image: mingkhoi/recsys-hdfs:fixbug-version1
+    ports:
+      - "8030" # RM scheduler address
+      - "8032" # RM address
+      - "8031" # RM resource-tracker address
+      - "8033" # RM admin address
+      - "8088" # RM webapp address
+      - "8090" # RM webapp https address
+    networks:
+      recsys-network:
+        ipv4_address: 128.0.5.5
+    volumes:
+      - /virtual/data/recsys/metadata/hdfs/resource_manager:/home/hadoop/hdfs:rw
+      - ./entry.sh:/entry.sh:rw
+      - ./config/hdfs/resource_manager:/opt/hadoop-3/etc/hadoop:rw
+    entrypoint: ["/bin/sh", "-c", "/entry.sh"]
+
+  hdfs-datanode1:
+
+    container_name: recsys-datanode1
+    hostname: recsys-datanode1
+    user: hadoop
+    # ubuntu original image
+    # image: ubuntu:18.04@sha256:512274f1739676880585e70eea6a883db7b6d92841b02647b6c92b478356572c
+
+    # build from ubuntu image, add HDFS + corretto8
+    image: mingkhoi/recsys-hdfs:fixbug-version1
+    ports:
+      - "9866" # DN address
+      - "9864" # DN http address
+      - "9867" # DN ipc address
+      - "9865" # DN https address
+      - "8040" # NM localizer address
+      - "8048" # NM collector-service address
+      - "8042" # NM webapp address
+      - "8044" # NM webapp https address
+      - "8049" # NM amrmproxy address
+    networks:
+      recsys-network:
+        ipv4_address: 128.0.5.6
+    volumes:
+      - /virtual/data/recsys/metadata/hdfs/datanode1:/home/hadoop/hdfs:rw
+      - ./entry.sh:/entry.sh:rw
+      - ./config/hdfs/datanode1:/opt/hadoop-3/etc/hadoop:rw
+      - ./virtual:/virtual:rw # virtual env to run client application
+    entrypoint: ["/bin/sh", "-c", "/entry.sh"]
+
+  hdfs-datanode2:
+
+    container_name: recsys-datanode2
+    hostname: recsys-datanode2
+    user: hadoop
+    # ubuntu original image
+    # image: ubuntu:18.04@sha256:512274f1739676880585e70eea6a883db7b6d92841b02647b6c92b478356572c
+
+    # build from ubuntu image, add HDFS + corretto8
+    image: mingkhoi/recsys-hdfs:fixbug-version1
+    ports:
+      - "9866" # DN address
+      - "9864" # DN http address
+      - "9867" # DN ipc address
+      - "9865" # DN https address
+      - "8040" # NM localizer address
+      - "8048" # NM collector-service address
+      - "8042" # NM webapp address
+      - "8044" # NM webapp https address
+      - "8049" # NM amrmproxy address
+    networks:
+      recsys-network:
+        ipv4_address: 128.0.5.7
+    volumes:
+      - /virtual/data/recsys/metadata/hdfs/datanode2:/home/hadoop/hdfs:rw
+      - ./entry.sh:/entry.sh:rw
+      - ./config/hdfs/datanode2:/opt/hadoop-3/etc/hadoop:rw
+      - ./virtual:/virtual:rw # virtual env to run client application
+    entrypoint: ["/bin/sh", "-c", "/entry.sh"]
+
+  hdfs-datanode3:
+
+    container_name: recsys-datanode3
+    hostname: recsys-datanode3  
+    user: hadoop
+    # ubuntu original image
+    # image: ubuntu:18.04@sha256:512274f1739676880585e70eea6a883db7b6d92841b02647b6c92b478356572c
+
+    # build from ubuntu image, add HDFS + corretto8
+    image: mingkhoi/recsys-hdfs:fixbug-version1
+    ports:
+      - "9866" # DN address
+      - "9864" # DN http address
+      - "9867" # DN ipc address
+      - "9865" # DN https address
+      - "8040" # NM localizer address
+      - "8048" # NM collector-service address
+      - "8042" # NM webapp address
+      - "8044" # NM webapp https address
+      - "8049" # NM amrmproxy address
+    networks:
+      recsys-network:
+        ipv4_address: 128.0.5.8
+    volumes:
+      - /virtual/data/recsys/metadata/hdfs/datanode3:/home/hadoop/hdfs:rw
+      - ./entry.sh:/entry.sh:rw
+      - ./config/hdfs/datanode3:/opt/hadoop-3/etc/hadoop:rw
+      - ./virtual:/virtual:rw # virtual env to run client application
+    entrypoint: ["/bin/sh", "-c", "/entry.sh"]
+
+  hdfs-datanode4:
+
+    container_name: recsys-datanode4
+    hostname: recsys-datanode4  
+    user: hadoop
+    # ubuntu original image
+    # image: ubuntu:18.04@sha256:512274f1739676880585e70eea6a883db7b6d92841b02647b6c92b478356572c
+
+    # build from ubuntu image, add HDFS + corretto8
+    image: mingkhoi/recsys-hdfs:fixbug-version1
+    ports:
+      - "9866" # DN address
+      - "9864" # DN http address
+      - "9867" # DN ipc address
+      - "9865" # DN https address
+      - "8040" # NM localizer address
+      - "8048" # NM collector-service address
+      - "8042" # NM webapp address
+      - "8044" # NM webapp https address
+      - "8049" # NM amrmproxy address
+    networks:
+      recsys-network:
+        ipv4_address: 128.0.5.14
+    volumes:
+      - /virtual/data/recsys/metadata/hdfs/datanode4:/home/hadoop/hdfs:rw
+      - ./entry.sh:/entry.sh:rw
+      - ./config/hdfs/datanode4:/opt/hadoop-3/etc/hadoop:rw
+      - ./virtual:/virtual:rw # virtual env to run client application
+    entrypoint: ["/bin/sh", "-c", "/entry.sh"]
+
+  hdfs-datanode5:
+
+    container_name: recsys-datanode5
+    hostname: recsys-datanode5
+    user: hadoop
+    # ubuntu original image
+    # image: ubuntu:18.04@sha256:512274f1739676880585e70eea6a883db7b6d92841b02647b6c92b478356572c
+
+    # build from ubuntu image, add HDFS + corretto8
+    image: mingkhoi/recsys-hdfs:fixbug-version1
+    ports:
+      - "9866" # DN address
+      - "9864" # DN http address
+      - "9867" # DN ipc address
+      - "9865" # DN https address
+      - "8040" # NM localizer address
+      - "8048" # NM collector-service address
+      - "8042" # NM webapp address
+      - "8044" # NM webapp https address
+      - "8049" # NM amrmproxy address
+    networks:
+      recsys-network:
+        ipv4_address: 128.0.5.15
+    volumes:
+      - /virtual/data/recsys/metadata/hdfs/datanode5:/home/hadoop/hdfs:rw
+      - ./entry.sh:/entry.sh:rw
+      - ./config/hdfs/datanode5:/opt/hadoop-3/etc/hadoop:rw
+      - ./virtual:/virtual:rw # virtual env to run client application
+    entrypoint: ["/bin/sh", "-c", "/entry.sh"]
+
+  build-hdfs:
+
+    container_name: build-hdfs
+    user: hadoop
+    # ubuntu original image
+    # image: ubuntu:18.04@sha256:512274f1739676880585e70eea6a883db7b6d92841b02647b6c92b478356572c
+
+    # build from ubuntu image, add HDFS + corretto8
+    image: mingkhoi/recsys-hdfs:fixbug-version1
+    networks:
+      recsys-network:
+        ipv4_address: 128.0.5.9
+    entrypoint: ["tail", "-f", "/dev/null"]
+
+  build-tensor:
+
+    container_name: build-tensor
+    user: root
+    # ubuntu original image
+    # image: ubuntu:18.04@sha256:512274f1739676880585e70eea6a883db7b6d92841b02647b6c92b478356572c
+
+    # build from ubuntu image, add HDFS + corretto8
+    image: mingkhoi/recsys:fixbug-version1
+    networks:
+      recsys-network:
+        ipv4_address: 128.0.5.10
+    entrypoint: ["tail", "-f", "/dev/null"]
+
+networks:
+  recsys-network:
+    name: recsys-network
+    ipam:
+      driver: default
+      config:
+        - subnet: "128.0.5.0/24"

@@ -1,0 +1,15 @@
+echo "128.0.5.2           recsys-server1" >> /etc/hosts
+echo "128.0.5.11          recsys-sparkmaster1" >> /etc/hosts
+echo "128.0.5.12          recsys-sparkworker1" >> /etc/hosts
+echo "128.0.5.13          recsys-sparkworker2" >> /etc/hosts
+echo "128.0.5.16          recsys-sparkworker3" >> /etc/hosts
+echo "128.0.5.3           recsys-namenode1" >> /etc/hosts
+echo "128.0.5.4           recsys-namenode2" >> /etc/hosts
+echo "128.0.5.5           recsys-resourcemanager" >> /etc/hosts
+echo "128.0.5.6           recsys-datanode1" >> /etc/hosts
+echo "128.0.5.7           recsys-datanode2" >> /etc/hosts
+echo "128.0.5.8           recsys-datanode3" >> /etc/hosts
+echo "128.0.5.14          recsys-datanode4" >> /etc/hosts
+echo "128.0.5.15          recsys-datanode5" >> /etc/hosts
+echo "128.0.5.9           build-hdfs" >> /etc/hosts
+echo "128.0.5.10          build-tensor" >> /etc/hosts

@@ -1,0 +1,2869 @@
+Open article
+author
+author
+author
+author
+author
+author
+author
+author
+author
+author
+title
+journal
+year
+ee
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Paul Kocher",
+        "Daniel Genkin",
+        "Daniel Gruss",
+        "Werner Haas 0004",
+        "Mike Hamburg",
+        "Moritz Lipp",
+        "Stefan Mangard",
+        "Thomas Prescher 0002",
+        "Michael Schwarz 0001",
+        "Yuval Yarom"
+    ],
+    "title": "Spectre Attacks: Exploiting Speculative Execution.",
+    "year": 2018,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "meltdownattack.com",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+author
+author
+author
+author
+author
+author
+author
+title
+journal
+ee
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Moritz Lipp",
+        "Michael Schwarz 0001",
+        "Daniel Gruss",
+        "Thomas Prescher 0002",
+        "Werner Haas 0004",
+        "Stefan Mangard",
+        "Paul Kocher",
+        "Daniel Genkin",
+        "Yuval Yarom",
+        "Mike Hamburg"
+    ],
+    "title": "Meltdown",
+    "year": 2018,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "meltdownattack.com",
+    "isbn": ""
+}
+Open book
+title
+year
+ee
+ee
+isbn
+Close book
+{
+    "id": 0,
+    "entry": "",
+    "author": [],
+    "title": "Computer Science Curricula 2013",
+    "year": 2013,
+    "month": -1,
+    "url": [],
+    "ee": [
+        "https://doi.org/10.1145/2534860",
+        "https://www.wikidata.org/entity/Q107021707"
+    ],
+    "address": [],
+    "journal": "",
+    "isbn": "978-1-4503-2309-3"
+}
+Open article
+author
+title
+journal
+month
+year
+url
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Frank Manola"
+    ],
+    "title": "An Evaluation of Object-Oriented DBMS Developments: 1994 Edition.",
+    "year": 1994,
+    "month": 8,
+    "url": [
+        "db/journals/gtelab/index.html#TR-0263-08-94-165"
+    ],
+    "ee": [],
+    "address": [],
+    "journal": "GTE Laboratories Incorporated",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+month
+year
+url
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Michael L. Brodie",
+        "Michael Stonebraker"
+    ],
+    "title": "DARWIN: On the Incremental Migration of Legacy Information Systems",
+    "year": 1993,
+    "month": 3,
+    "url": [
+        "db/journals/gtelab/index.html#TR-0222-10-92-165"
+    ],
+    "ee": [],
+    "address": [],
+    "journal": "GTE Laboratories Incorporated",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+title
+journal
+month
+year
+url
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Mark F. Hornick",
+        "Joe D. Morrison",
+        "Farshad Nayeri"
+    ],
+    "title": "Integrating Heterogeneous, Autonomous, Distributed Applications Using the DOM Prototype.",
+    "year": 1991,
+    "month": 12,
+    "url": [
+        "db/journals/gtelab/index.html#TR-0174-12-91-165"
+    ],
+    "ee": [],
+    "address": [],
+    "journal": "GTE Laboratories Incorporated",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+month
+year
+url
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Frank Manola"
+    ],
+    "title": "Object Model Capabilities For Distributed Object Management.",
+    "year": 1989,
+    "month": 6,
+    "url": [
+        "db/journals/gtelab/index.html#TM-0149-06-89-165"
+    ],
+    "ee": [],
+    "address": [],
+    "journal": "GTE Laboratories Incorporated",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+month
+year
+url
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Frank Manola"
+    ],
+    "title": "Integrating Object-Oriented Applications and Middleware with Relational Databases.",
+    "year": 1995,
+    "month": 11,
+    "url": [
+        "db/journals/gtelab/index.html#TR-0310-11-95-165"
+    ],
+    "ee": [],
+    "address": [],
+    "journal": "GTE Laboratories Incorporated",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+title
+journal
+month
+year
+url
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Alejandro P. Buchmann",
+        "M. Tamer &Ouml;zsu",
+        "Dimitrios Georgakopoulos"
+    ],
+    "title": "Towards a Transaction Management System for DOM.",
+    "year": 1991,
+    "month": 6,
+    "url": [
+        "db/journals/gtelab/index.html#TR-0146-06-91-165"
+    ],
+    "ee": [],
+    "address": [],
+    "journal": "GTE Laboratories Incorporated",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+month
+year
+url
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Frank Manola",
+        "Sandra Heiler"
+    ],
+    "title": "A 'RISC' Object Model for Object System Interoperation: Concepts and Applications.",
+    "year": 1993,
+    "month": 8,
+    "url": [
+        "db/journals/gtelab/index.html#TR-0231-08-93-165"
+    ],
+    "ee": [],
+    "address": [],
+    "journal": "GTE Laboratories Incorporated",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+month
+year
+url
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Frank Manola"
+    ],
+    "title": "MetaObject Protocol Concepts for a RISC Object Model.",
+    "year": 1993,
+    "month": 12,
+    "url": [
+        "db/journals/gtelab/index.html#TR-0244-12-93-165"
+    ],
+    "ee": [],
+    "address": [],
+    "journal": "GTE Laboratories Incorporated",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+month
+year
+url
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Frank Manola"
+    ],
+    "title": "Object Data Language Facilities for Multimedia Data Types.",
+    "year": 1991,
+    "month": 12,
+    "url": [
+        "db/journals/gtelab/index.html#TR-0169-12-91-165"
+    ],
+    "ee": [],
+    "address": [],
+    "journal": "GTE Laboratories Incorporated",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+title
+journal
+month
+year
+url
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Frank Manola",
+        "Mark F. Hornick",
+        "Alejandro P. Buchmann"
+    ],
+    "title": "Object Data Model Facilities for Multimedia Data Types.",
+    "year": 1990,
+    "month": 12,
+    "url": [
+        "db/journals/gtelab/index.html#TM-0332-11-90-165"
+    ],
+    "ee": [],
+    "address": [],
+    "journal": "GTE Laboratories Incorporated",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+month
+year
+url
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Frank Manola"
+    ],
+    "title": "Distributed Object Management Technology.",
+    "year": 1988,
+    "month": 6,
+    "url": [
+        "db/journals/gtelab/index.html#TM-0014-06-88-165"
+    ],
+    "ee": [],
+    "address": [],
+    "journal": "GTE Laboratories Incorporated",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+month
+year
+url
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Farshad Nayeri",
+        "Benjamin Hurwitz"
+    ],
+    "title": "Experiments with Dispatching in a Distributed Object System.",
+    "year": 1993,
+    "month": 7,
+    "url": [
+        "db/journals/gtelab/index.html#TR-0236-09-93-165"
+    ],
+    "ee": [],
+    "address": [],
+    "journal": "GTE Laboratories Incorporated",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+month
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Michael Stonebraker"
+    ],
+    "title": "Muffin: A Distributed Database Machine",
+    "year": 1979,
+    "month": 5,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "University of California at Berkeley",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+url
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "David Beech",
+        "Cetin Ozbutun"
+    ],
+    "title": "Object Oriented DBMS as a Generalization of Relational DBMS",
+    "year": 1990,
+    "month": -1,
+    "url": [
+        "db/conf/x3h2/index.html#X3H2-90-412"
+    ],
+    "ee": [],
+    "address": [],
+    "journal": "ANSI X3H2",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+author
+title
+journal
+month
+year
+url
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Krishna G. Kulkarni",
+        "Jim Melton",
+        "Jonathan Bauer",
+        "Mike Kelley"
+    ],
+    "title": "Inheritance for ADTs (revised)",
+    "year": 1991,
+    "month": 7,
+    "url": [
+        "db/conf/x3h2/index.html#X3H2-91-133rev1"
+    ],
+    "ee": [],
+    "address": [],
+    "journal": "ANSI X2H2",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+url
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Phil Shaw"
+    ],
+    "title": "Modification of User Defined Types",
+    "year": 1990,
+    "month": -1,
+    "url": [
+        "db/conf/x3h2/index.html#X3H2-90-292"
+    ],
+    "ee": [],
+    "address": [],
+    "journal": "ANSI X3H2",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+title
+journal
+month
+year
+url
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Jim Melton",
+        "Jonathan Bauer",
+        "Krishna G. Kulkarni"
+    ],
+    "title": "Object ADTs (with improvements for Value ADTs)",
+    "year": 1991,
+    "month": 4,
+    "url": [
+        "db/conf/x3h2/index.html#X3H2-91-083rev1"
+    ],
+    "ee": [],
+    "address": [],
+    "journal": "ANSI X3H2",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+url
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "David Beech"
+    ],
+    "title": "Unification of Value and Object ADTs",
+    "year": 1992,
+    "month": -1,
+    "url": [
+        "db/conf/x3h2/index.html#X3H2-92-062"
+    ],
+    "ee": [],
+    "address": [],
+    "journal": "ANSI X3H2",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Rolf Sander"
+    ],
+    "title": "Die Repr&auml;sentation r&auml;umlichen Wissens und die Behandlung von Einbettungsproblemen mit Quadtreedepiktionen",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Thomas Ludwig 0001"
+    ],
+    "title": "Algebraical Optimization of FTA-Expressions",
+    "year": 1988,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Werner Emde",
+        "Claus-Rainer Rollinger"
+    ],
+    "title": "Wissensrepr&auml;sentation und Maschinelles Lernen",
+    "year": 1987,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Christoph Beierle",
+        "Udo Pletat",
+        "Hans Uszkoreit"
+    ],
+    "title": "An Algebraic Characterization of STUF",
+    "year": 1988,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Ulrike Rackow",
+        "Ido Dagan",
+        "Ulrike Schwall"
+    ],
+    "title": "A Combined Symbolic-Empirical Apprach for the Automatic Translation of Compounds",
+    "year": 1992,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Brigitte Bartsch-Sp&ouml;rl"
+    ],
+    "title": "Zur Systemarchitektur von LILOG",
+    "year": 1987,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Memo",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Erich Gehlen",
+        "Burkhard Kehrbusch"
+    ],
+    "title": "Mengenorientierte Auswertung von Anfragen in der Logikprogrammiersprache PROLOG",
+    "year": 1988,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Markus H&ouml;hfeld",
+        "Gert Smolka"
+    ],
+    "title": "Definite Resolution over Constraint Languages",
+    "year": 1988,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Birgit Wesche"
+    ],
+    "title": "Dokumentation der Syntax der LILOG-Grammatik",
+    "year": 1988,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Memo",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Christopher Habel"
+    ],
+    "title": "Cognitive Linguistics: The Processing of Spatial Concepts",
+    "year": 1988,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Thomas Ludwig 0001",
+        "Bernd Walter",
+        "Michael Ley",
+        "Albert Maier",
+        "Erich Gehlen"
+    ],
+    "title": "LILOG-DB: Database Support for Knowledge-Based Systems",
+    "year": 1988,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Thomas Ludwig 0001",
+        "Stefan Benzschawel",
+        "Erich Gehlen"
+    ],
+    "title": "Differential Closure Computation for General Horn-Clause Queries",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [],
+    "title": "SQL/Data System for VSE: A Relational Data System for Application Development.",
+    "year": 1981,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IBM Publication",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Egon B&ouml;rger"
+    ],
+    "title": "A Logical Operational Semantics of Full Prolog",
+    "year": 1990,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Michael Ley"
+    ],
+    "title": "Ein Fact Manager zur persistenten Speicherung variabel strukturierter komplexer Objekte",
+    "year": 1988,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Roland Seiffert"
+    ],
+    "title": "How could a good system of practical NLP look like?",
+    "year": 1992,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Gisela Sch&ouml;pke"
+    ],
+    "title": "M&ouml;glichkeiten des Einsatzes eines dreiwertigen Theorembeweisers",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Stefan B&ouml;ttcher"
+    ],
+    "title": "Attribute Inheritance Implemented on Top of a Relational Database System",
+    "year": 1989,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Ulrike Schwall"
+    ],
+    "title": "LMT - Machine Translation Demonstration",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Rudi Studer",
+        "Bernd Walter"
+    ],
+    "title": "Implementation Aspects of a Natural Language Understanding System in a Prolog/DB Environment",
+    "year": 1986,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Albert Maier",
+        "Michael Ley",
+        "Erich Gehlen"
+    ],
+    "title": "Sort Processing in a Deductive Database System",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Thomas Ludwig 0001",
+        "Bernd Walter"
+    ],
+    "title": "EFTA: A Database Retrieval Algebra for Feature Terms",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Toni Bollinger",
+        "Udo Pletat"
+    ],
+    "title": "Knowledge in Operation",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Christoph Beierle"
+    ],
+    "title": "An Overview on Planning Applications in PROTOS-L",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Carola Eschenbach"
+    ],
+    "title": "&Uuml;ber Ans&auml;tze zur Darstellung von Konzepten und Prototypen",
+    "year": 1988,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Manfred Schmidt-Schau&szlig;",
+        "Gert Smolka"
+    ],
+    "title": "Attributive Concept Descriptions with Unions and Complements",
+    "year": 1989,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Hans-Joachim Goltz"
+    ],
+    "title": "Ein praktischer Algorithmus f&uuml;r die E-Unifikation",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Claus-Rainer Rollinger"
+    ],
+    "title": "Simulation Sprachlichen Verstehens: Generelle Probleme bei der semantischen Interpretation der nat&uuml;rlichen Sprache",
+    "year": 1986,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Otthein Herzog"
+    ],
+    "title": "The Institute for Knowledge Based Systems in the IBM Germany Scientific Center",
+    "year": 1990,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Bernhard Beckert"
+    ],
+    "title": "Konzeption und Implementierung von Gleichheit f&uuml;r einen tableau-basierten Theorem-Beweiser",
+    "year": 1992,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Christoph Beierle",
+        "Stefan B&ouml;ttcher"
+    ],
+    "title": "PROTOS-L: Towards a Knowledge Base Programming Language",
+    "year": 1989,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Stefan J. Schierholz"
+    ],
+    "title": "Syntaktische Informationseinheiten zu deutschen Adjektiven",
+    "year": 1992,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Christoph Beierle",
+        "Udo Pletat"
+    ],
+    "title": "On the Interpretation of Equality, Sorts, and Logic Programming",
+    "year": 1987,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Birgit Wendholt"
+    ],
+    "title": "DInG - ein Dom&auml;nen-orientierter Inkrementeller und Integrierter Generator f&uuml;r koh&auml;rente Texte",
+    "year": 1992,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Gudrun Klose"
+    ],
+    "title": "Prozedurale Semantik. Repr&auml;sentation der Sprechergegenwart.",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Michael Herweg",
+        "Mohammed Nadjib Khenkhar",
+        "Simone Pribbenow",
+        "Klaus Rehk&auml;mper"
+    ],
+    "title": "Elsa&szlig;-Wanderung f&uuml;r Linguisten: Exemplarische Analyse und Repr&auml;sentation eines Satzes aus einer Reisebeschreibung",
+    "year": 1988,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Memo",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Anja Theuner"
+    ],
+    "title": "\"Dictionary Dialog\" - Entwurf des Funktionsumfangs f&uuml;r eine Benutzerschnittstelle eines integrierten maschinellen/maschinenunterst&uuml;tzten &Uuml;bersetzungssystems und prototypische Erstellung der Bildschirmfolge f&uuml;r die Funktion \"Semantische Relation\"",
+    "year": 1992,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Brigitte Bartsch-Sp&ouml;rl"
+    ],
+    "title": "Zur Behandlung komplexer Objekte in LILOG",
+    "year": 1987,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Memo",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Peter H. Schmitt"
+    ],
+    "title": "Computational aspects of three-valued logic",
+    "year": 1987,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Christoph Beierle",
+        "Udo Pletat"
+    ],
+    "title": "Semantics of Logic Programs with Equational Abstract Data Type Specifications",
+    "year": 1988,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Claudia Maienborn"
+    ],
+    "title": "Processing Spatial Knowledge in LILOG",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Brigitte Bl&auml;ser",
+        "Ulrike Schwall",
+        "Angelika Storrer"
+    ],
+    "title": "A Reusable Lexical Database Tool for Machine Translation",
+    "year": 1992,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Esther K&ouml;nig"
+    ],
+    "title": "Der Lambek-Kalk&uuml;l. Eine Logik f&uuml;r lexikalische Grammatiken",
+    "year": 1990,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Claudia Mrotzek"
+    ],
+    "title": "Parenthetische Konstruktionen des Deutschen.",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Birgit Wesche"
+    ],
+    "title": "Symmetric Coordination: An Alternative Theory of Phrase Structure",
+    "year": 1992,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Stefan B&ouml;rner",
+        "Rudi Studer"
+    ],
+    "title": "An Approach to Manage Large Inheritance Networks",
+    "year": 1987,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Lutz Voelkel"
+    ],
+    "title": "On the Problem of Masking Special Errors by Serial Signature Analysis",
+    "year": 1999,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Peter H. Schmitt"
+    ],
+    "title": "Eine dreiwertige Logik zur Verarbeitung partieller Information",
+    "year": 1987,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Stefan B&ouml;ttcher"
+    ],
+    "title": "An Inference Engine for Function Free Logic Programs",
+    "year": 1990,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Kai-Uwe Carstensen"
+    ],
+    "title": "Aspekte der Generierung von Wegbeschreibungen",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Ulrike Weiland",
+        "Martin H&uuml;bner"
+    ],
+    "title": "Das Projekt EXCEPT: Expert-System for Computer-Aided Environmental Planning Tasks",
+    "year": 1990,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Egon B&ouml;rger",
+        "Peter H. Schmitt"
+    ],
+    "title": "A Formal Operational Semantics for PROLOG III: Using Dynamic Algebras",
+    "year": 1990,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Michael Czymmeck"
+    ],
+    "title": "Subsumtion f&uuml;r eine erweiterte attributive Sortenbeschreibungssprache",
+    "year": 1989,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Michael Tarnowski"
+    ],
+    "title": "Mathematische Grundlagen der formalen Linguistik - Ein Kompendium",
+    "year": 1990,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Helmar Gust",
+        "Petra Ludewig",
+        "Mechthild Rickheit"
+    ],
+    "title": "Die Struktur des Lexikons f&uuml;r LILOG",
+    "year": 1988,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Martin H&uuml;bner",
+        "Kai von Luck",
+        "Ulrike Weiland"
+    ],
+    "title": "Die Konzeption des EXCEPT-Systems: Ein &Uuml;berblick",
+    "year": 1990,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Elisabeth Neugebauer"
+    ],
+    "title": "Richtungsangabe oder Wegkonnektor? R&auml;mliches \"Zur&uuml;ck\" und seine Semantik",
+    "year": 1992,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Mohammed Nadjib Khenkhar"
+    ],
+    "title": "Vor&uuml;berlegungen zur depiktionalen Repr&auml;sentation r&auml;umlichen Wissens",
+    "year": 1988,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Sitaram Lanka",
+        "Eric Mays"
+    ],
+    "title": "Fully Persistent B<sup>+</sup>-trees",
+    "year": 1990,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Petra Maier"
+    ],
+    "title": "Der modale Infinitiv: Syntaktische oder lexikalische Beschreibung?",
+    "year": 1987,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Michel E. Adiba",
+        "Bruce G. Lindsay 0001"
+    ],
+    "title": "Database Snapshots.",
+    "year": 1980,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "Research Report / RJ / IBM / San Jose, California",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Birgit Wesche"
+    ],
+    "title": "At Ease with \"AT\"",
+    "year": 1987,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Stefan B&ouml;rner"
+    ],
+    "title": "Datenbankunterst&uuml;tzung f&uuml;r wissensbasierte Systeme",
+    "year": 1987,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Gudrun Klose",
+        "Ewald Lang",
+        "Thomas Pirlein"
+    ],
+    "title": "Die Ontologie und Axiomatik der Wissensbasis von LEU/2 - Erfahrungen, Probleme, Ausblicke",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Gerd Kort&uuml;m"
+    ],
+    "title": "Temporales Schlie&szlig;en in einem nat&uuml;rlichsprachlichen System",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Ipke Wachsmuth"
+    ],
+    "title": "Zur intelligenten Organisation von Wissensbest&auml;nden in k&uuml;nstlichen Systemen",
+    "year": 1989,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Udo Pletat",
+        "Christoph Beierle"
+    ],
+    "title": "The Semantics of Asserting and Retracting Clauses to Logic Programs",
+    "year": 1987,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Christoph Beierle",
+        "Egon B&ouml;rger"
+    ],
+    "title": "Correctness Proof for the WAM",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Birgit Wesche",
+        "Ingrid Renz"
+    ],
+    "title": "Word Order and Focus Projection",
+    "year": 1987,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Kai von Luck"
+    ],
+    "title": "KL-ONE: Eine Einf&uuml;hrung",
+    "year": 1990,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Stefan B&ouml;ttcher"
+    ],
+    "title": "Improving the Concurrency of Integrity Checks and Write Operations",
+    "year": 1990,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Noam Paz"
+    ],
+    "title": "&Uuml;ber Vergleichskonstruktionen",
+    "year": 1989,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Kurt Eberle"
+    ],
+    "title": "Ereignisse: Ihre Logik und Ontologie aus textsemantischer Sicht",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Michael Ley",
+        "Bernd Walter"
+    ],
+    "title": "Der LILOG-DB Fact Manager: Ein Datenbankkern zur Speicherung variabel strukturierter komplexer Objekte",
+    "year": 1989,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [],
+    "title": "Wissensbasierte Systeme in der Medizin: GMDS/GI, Abstracts des 1. gemeinsamen Workshops der AG Expertensysteme der GMDS und der FG Diagnostik und Klassifikation im GI-Fachausschu&szlig; 1.5, 29.-30. M&auml;rz 1990, Heidelberg",
+    "year": 1990,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Gregor Erbach"
+    ],
+    "title": "An Environment for Experimentation with Parsing Strategies",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Christos Garidis"
+    ],
+    "title": "Logisches Clustering von PROTOS-L Prozeduren",
+    "year": 1988,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Jennifer A. Brundage",
+        "Maren Kresse",
+        "Ulrike Schwall",
+        "Angelika Storrer"
+    ],
+    "title": "Multiword Lexemes: A Monolingual and Contrastive Typology for NLP and MT",
+    "year": 1992,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Toni Bollinger"
+    ],
+    "title": "A Model Elimination Calculus for Generalized Clauses",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Stefan J. Schierholz",
+        "Eric Windisch"
+    ],
+    "title": "Quantitative Analysen zu W&ouml;rterb&uuml;chern",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Gregor Erbach"
+    ],
+    "title": "Lexical Representation of Idioms",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Toni Bollinger",
+        "Udo Pletat"
+    ],
+    "title": "The LILOG Knowledge Representation System",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Peter Gerstl"
+    ],
+    "title": "Mengenkonzepte in Unifikationsgrammatiken",
+    "year": 1992,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+author
+title
+journal
+month
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Dines Bj&oslash;rner",
+        "E. F. Codd",
+        "Kenneth L. Deckert",
+        "Irving L. Traiger"
+    ],
+    "title": "The Gamma-0 n-ary Relational Data Base Interface Specifications of Objects and Operations.",
+    "year": 1973,
+    "month": 4,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "Research Report / RJ / IBM / San Jose, California",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Ulrike Rackow"
+    ],
+    "title": "On the Treatment of Compounds in Machine Translation. A Study",
+    "year": 1992,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Claudia Maienborn"
+    ],
+    "title": "Position und Bewegung: Zur Semantik lokaler Verben",
+    "year": 1990,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Sonja M&uuml;ller"
+    ],
+    "title": "Zur Systematik morphologischer Paradigmen: Die deutschen Verben in der Computermorphologie",
+    "year": 1992,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Christoph Beierle",
+        "Egon B&ouml;rger"
+    ],
+    "title": "A WAM Extension for Type-Constraint Logic Programming: Specification and Correctness Proof",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Rolf Mayer"
+    ],
+    "title": "Domain Restriction and Other Kinds of Reference Set Operations in Sentence and Discourse Semantics.",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [],
+    "title": "Umweltbewertung mit EXCEPT: Darstellung aus &ouml;kologischer Sicht",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "R&uuml;diger Wirth"
+    ],
+    "title": "Lernverfahren zur Vervollst&auml;ndigung von Hornklauselmengen durch inverse Resolution",
+    "year": 1989,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Holger M. Wittmann"
+    ],
+    "title": "Ein Beispiel zur wissensbasierten Produktionsplanung mit PROTOS-L.",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Mechthild Rickheit"
+    ],
+    "title": "Zum Begriff \"Argumentstruktur\" im Rahmen generativer worbildungstheoretischer Ans&auml;tze",
+    "year": 1988,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Jan Wilms"
+    ],
+    "title": "Standards f&uuml;r das Programmieren in Prolog f&uuml;r LILOG, Version 2.0",
+    "year": 1987,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Memo",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Michael Ley"
+    ],
+    "title": "The Term Retrieval Abstract Machine",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Kai Lebeth",
+        "Bernd Abb"
+    ],
+    "title": "Syntaktische Analysevorschl&auml;ge zur Behandlung von lokalen Pr&auml;fixverben in einem System f&uuml;r die Generierung von Wegbeschreibungen",
+    "year": 1992,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Gert Smolka"
+    ],
+    "title": "Feature Constraint Logics for Unification Grammars",
+    "year": 1989,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "J&ouml;rg Heinrich"
+    ],
+    "title": "Ein Transaktionskonzept f&uuml;r LILOG",
+    "year": 1987,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Memo",
+    "isbn": ""
+}
+Open article
+author
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Andreas Eisele 0001",
+        "Jochen D&ouml;rre"
+    ],
+    "title": "Disjunctive Unification",
+    "year": 1990,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Rainer B&auml;uerle"
+    ],
+    "title": "Ereignisse und Repr&auml;sentationen",
+    "year": 1988,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "LILOG-Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Sven Lorenz"
+    ],
+    "title": "On the Role of Reasoning about Change in the Projection of Presuppositions",
+    "year": 1992,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Egon B&ouml;rger"
+    ],
+    "title": "A Logical Operational Semantics of Full Prolog Part II: Built-in Predicates for Database Manipulations",
+    "year": 1990,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Thomas Ludwig 0001"
+    ],
+    "title": "A Brief Overlook of LILOG-DB",
+    "year": 1989,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+title
+journal
+year
+Close article
+{
+    "id": 0,
+    "entry": "",
+    "author": [
+        "Michael Klein"
+    ],
+    "title": "Leistungsanalyse des Datenbanksystems LILOG-DB",
+    "year": 1991,
+    "month": -1,
+    "url": [],
+    "ee": [],
+    "address": [],
+    "journal": "IWBS Report",
+    "isbn": ""
+}
+Open article
+author
+author
+author
+author
+author
+title
+journal
+month
+year
