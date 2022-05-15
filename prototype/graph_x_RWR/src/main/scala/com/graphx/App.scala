@@ -62,39 +62,27 @@ object App {
         // print(graph.vertices.collect().mkString("\n"))
         // print(graph.edges.collect().mkString("\n"))
 
-        val sourceId: VertexId = 1L
-        val initial_graph = graph.mapVertices((id, attr) =>
-            if (sourceId == id) (attr._1, 0D) else (attr._1, Double.PositiveInfinity))
+        val sourceIds: List[VertexId] = List(1L)
+        val initial_graph = graph.mapVertices((id, attr) => 
+            if (sourceIds.contains(id)) (attr._1, 0D) else (attr._1, Double.PositiveInfinity))
 
         val sssp = initial_graph.pregel(Double.PositiveInfinity)(
-            // Update vertex, join on id
+            // Map vertex, join on id
             // Original vertex      = (id, (String, Double))
-            // New vertex dist      = (id, Double)
+            // Merged vertex        = (id, Double)
             (id, dist, newDist) => (dist._1, math.min(dist._2, newDist)),
             // From triplet, calculate new vertex -> (id, new_distance)
             triplet => {
                 // Attribute = property
-
                 if (triplet.srcAttr._2 + triplet.attr < triplet.dstAttr._2) {
                     Iterator((triplet.dstId, triplet.srcAttr._2 + triplet.attr))
                 } else {
                     Iterator.empty
                 }
             },
-            // Merge vertex on the same ID
+            // Merge vertex
             (a, b) => math.min(a, b)
         )
-        println(sssp.vertices.collect.mkString("\n"))
-
-        // === Result ===
-        // (8,(H,   15.0))
-        // (1,(A,   0.0))
-        // (9,(I,   14.0))
-        // (2,(B,   5.0))
-        // (3,(C,   5.0))
-        // (4,(D,   8.0))
-        // (5,(E,   14.0))
-        // (6,(F,   7.0))
-        // (7,(G,   12.0))         
+        println(sssp.vertices.collect.mkString("\n"))            
     }
 }
