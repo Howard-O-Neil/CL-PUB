@@ -36,6 +36,7 @@ spark = SparkSession.builder \
     .config("spark.yarn.appMasterEnv.PYSPARK_PYTHON", "/virtual/python/bin/python") \
     .config("spark.yarn.jars", "hdfs://128.0.5.3:9000/lib/java/spark/jars/*.jar") \
     .config("spark.sql.legacy.allowNonEmptyLocationInCTAS", "true") \
+    .config("spark.StorageLevel.DISK_ONLY", "true") \
     .getOrCreate()
 
 coauthor_schema = StructType([     
@@ -56,7 +57,21 @@ coauthor_schema = StructType([
 merge_df = spark.read.schema(coauthor_schema) \
     .parquet("/data/recsys/arnet/tables/coauthor/production/merge-0")
 
-merge_df.createOrReplaceTempView("coauthor_merge")
+merge_df.repartition(500).createOrReplaceTempView("coauthor_merge")
+
+paper_schema = StructType([       
+    StructField('_id', StringType(), False),
+    StructField('_status', IntegerType(), False),
+    StructField('_timestamp', LongType(), False),
+    StructField('id', StringType(), False),
+    StructField('title', StringType(), False),
+    StructField('year', FloatType(), False),
+])
+
+bibtex_df = spark.read.schema(paper_schema) \
+    .parquet("/data/recsys/arnet/tables/bibtex/production/merge-0")
+
+bibtex_df.repartition(500).createOrReplaceTempView("bibtex_merge")
 
 print("===== Count all")
 new_df = spark.sql("""
@@ -79,3 +94,11 @@ new_df = spark.sql("""
     group by _id
     having count(_status) > 1
 """).show()
+
+print("===== Count paper not found")
+new_df = spark.sql("""
+    select count(cm._id)
+    from coauthor_merge as cm left join bibtex_merge as bm on cm.paper_id = bm.id
+    where bm.id is NULL
+""")
+new_df.show()
