@@ -21,18 +21,19 @@ object App_params {
     var neighborProb_map    = collection.mutable.Map[Long, Float]()
     var restartProb_map     = collection.mutable.Map[Long, Float]()
 
-    val converge        = 0.0001f
+    // Converage concept
+    val converge        = 0.000001f
     var is_converge     = false
     var restart         = false
 
+    // Experimental max Step concept
+    // I haven't not yet found good formula on calculating MaxStep or MaxSuperStep
+    var maxStep         = Double.PositiveInfinity
+    var step            = 0
 }
 
 object App {
     val params      = App_params
-    var listProb    = List[Float]()
-    var maxProb     = 20
-    val probDist    = 0.75f
-    var generator   = new Random()
 
     val spark = SparkSession.builder
         .config("spark.app.name", "Recsys")
@@ -50,21 +51,6 @@ object App {
         out.close()
     }
 
-    def initListProb() = {
-        var currentProb = 0f
-
-        val loop = new Breaks
-        loop.breakable {
-            while (true) {
-                if (currentProb >= maxProb)
-                    loop.break
-                
-                listProb = listProb ::: List(currentProb)
-                currentProb += probDist
-            }
-        }
-    }
-
     def randNeighborProb() = {
         val schema      = sparkt.StructType(Array(
                             sparkt.StructField("id", sparkt.IntegerType, false)))
@@ -78,10 +64,6 @@ object App {
                 .withColumn("normal", sparkf.randn(System.nanoTime()))
         val randomValues = randomValues_df.collect().map(
             item => item(1).asInstanceOf[Double].toFloat)
-        
-        // var randomValues = List[Float]()
-        // for (i <- 1 to params.neighborProb_map.size)
-        //     randomValues = randomValues ::: List(generator.nextInt(maxProb) / maxProb.toFloat)
 
         var idx = 0
         params.neighborProb_map.foreach {
@@ -105,10 +87,6 @@ object App {
                 .withColumn("normal", sparkf.randn(System.nanoTime()))
         val randomValues = randomValues_df.collect().map(
             item => item(1).asInstanceOf[Double].toFloat)
-
-        // var randomValues = List[Float]()
-        // for (i <- 1 to params.restartProb_map.size)
-        //     randomValues = randomValues ::: List(generator.nextInt(maxProb) / maxProb.toFloat)
         
         var idx = 0
         params.restartProb_map.foreach {
@@ -176,7 +154,7 @@ object App {
 
         val dampingFactor   = 0.85f
         val restartProb     = 0.15f
-        val total_vertices = graph.vertices.count().toFloat
+        val total_vertices  = graph.vertices.count().toFloat
 
         val connected_groups_t = graph.ops.connectedComponents().vertices
         var connected_groups = connected_groups_t.map(x => (x._2, List(x._1)))
@@ -185,10 +163,25 @@ object App {
             (a, b) => a ::: b
         )
 
+        // writeToFile(graph.inDegrees.collect().mkString("\n"))
+
+        // sys.exit
+
+        var result_ranking_map      = collection.immutable.Seq[(Long, Float)]()
+        var single_node_count       = 0
         for (group <- connected_groups.collect()) {
             val subGraph            = graph.subgraph(vpred = (vid, attr) => group._2.contains(vid))
             val subGraphVertices    = subGraph.vertices.count()
 
+            if (subGraphVertices == 1)
+                single_node_count += 1
+        }
+
+        for (group <- connected_groups.collect()) {
+            val subGraph            = graph.subgraph(vpred = (vid, attr) => group._2.contains(vid))
+            val subGraphVertices    = subGraph.vertices.count()
+            val defaultRank         = 1f / total_vertices.toFloat
+            
             // Build a quick search map
 
             params.neighbor_map_in     = collection.mutable.Map[Long, List[Long]]()
@@ -199,11 +192,16 @@ object App {
             params.restartProb_map     = collection.mutable.Map[Long, Float]()
 
             for (neighbor <- subGraph.ops.collectNeighborIds(EdgeDirection.Out).collect()) {
-                params.neighbor_map_out    +=  (neighbor._1 -> neighbor._2.toList)
-                params.ranking_map         +=  (neighbor._1 -> 1f / total_vertices)
-                params.converge_map        +=  (neighbor._1 -> false)
-                params.neighborProb_map    +=  (neighbor._1 -> 0f)
-                params.restartProb_map     +=  (neighbor._1 -> 0f)
+                params.neighbor_map_out     +=  (neighbor._1 -> neighbor._2.toList)
+                params.converge_map         +=  (neighbor._1 -> false)
+                params.neighborProb_map     +=  (neighbor._1 -> 0f)
+                params.restartProb_map      +=  (neighbor._1 -> 0f)
+
+                if (neighbor._2.toList.length <= 0) {
+                    params.ranking_map      +=  (neighbor._1 -> restartProb * defaultRank)
+                } else {
+                    params.ranking_map      +=  (neighbor._1 -> defaultRank)
+                }
             }
             
             for (neighbor <- subGraph.ops.collectNeighborIds(EdgeDirection.In).collect()) {
@@ -213,86 +211,73 @@ object App {
             randNeighborProb()
             randResetProb()
 
-            var g: Graph[(String, Float, Int, Float), Double] = subGraph.mapVertices((id, attr) =>
-                (attr._1, params.neighborProb_map(id), 0, params.restartProb_map(id)))
+            var g: Graph[(String, Float, Float, Float, Int), Double] = subGraph.mapVertices((id, attr) =>
+                (attr._1, params.neighborProb_map(id), defaultRank, params.restartProb_map(id), 0))
 
-            // Experimental
-            // the idea is to somehow precalculate maxStep of walker 
-            //          instead of run until converge
-            // but i have not yet find the formula yet
-            val maxStep         = subGraph.vertices.count() * 5
-            var step            = 0
             params.is_converge  = false
+            params.restart      = false
 
             val loop = new Breaks
             loop.breakable {
                 while (true) {
-                    val msgs        = g.aggregateMessages[Int] (
+                    val msgs        = g.aggregateMessages[Float] (
                         triplet => {
-                            var converge_count = 0
-                            params.converge_map foreach {
-                                case (key, value) => if (value) converge_count += 1
-                            }
+                            var outlinks = params.neighbor_map_out(triplet.srcId)
 
-                            if (converge_count < subGraphVertices) {
-                                if (!params.restart) {
-                                    if (triplet.srcAttr._4 <= restartProb) {
-                                        params.restart = true
-                                    }
-                                }
-
-                                if (!params.restart && triplet.srcAttr._2 <= dampingFactor) {
-                                    var ranking = 0f
-                                    for (neighbor <- params.neighbor_map_in(triplet.srcId)) {
-                                        val outlinks = params.neighbor_map_out(neighbor)
-                                        
-                                        if (outlinks.length <= 1) {
-                                            ranking += params.ranking_map(neighbor) / total_vertices
-                                        } else {
-                                            ranking += params.ranking_map(neighbor) / outlinks.length
-                                        }
-                                    }
-
-                                    if (ranking == 0f) {
-                                        ranking = params.ranking_map(triplet.srcId)
-                                    } else {
-                                        ranking = (dampingFactor * ranking) + ((1f - dampingFactor) / total_vertices)
-                                    }
-
-                                    if (!params.converge_map(triplet.srcId) &&
-                                        (params.ranking_map(triplet.srcId) - ranking).abs > params.converge) {
-                                        params.ranking_map(triplet.srcId)  = ranking
-                                    } else {
-                                        params.converge_map(triplet.srcId) = true
-                                    }
-                                    triplet.sendToSrc(triplet.srcAttr._3 + 1)
-                                }
+                            if (outlinks.length <= 1) {
+                                triplet.sendToDst(triplet.srcAttr._3 / total_vertices)
                             } else {
-                                params.is_converge = true
+                                triplet.sendToDst(triplet.srcAttr._3 / outlinks.length)
                             }
                         },
                         (a, b) => a + b
                     )
-                    params.restart = false
-
-                    if (params.is_converge || subGraphVertices <= 1) {
-                        loop.break
-                    }
-
-                    g = g.ops.joinVertices(msgs) (
-                        (id, oldAttr, newDist) =>
-                            (oldAttr._1, oldAttr._2, newDist, oldAttr._4)
-                    )
 
                     randNeighborProb()
                     randResetProb()
-                    g = g.mapVertices((id, attr) =>
-                        (attr._1, params.neighborProb_map(id), attr._3, params.restartProb_map(id)))
 
-                    g.vertices.collect()
+                    val newVertices = g.vertices.join(msgs).map(
+                        x => {
+                            val id              = x._1
+                            val txt             = x._2._1._1
+                            val neighbor_prop   = x._2._1._2
+                            val oldDist         = x._2._1._3
+                            val restart_prop    = x._2._1._4
+                            val order           = x._2._1._5
+                            val newDist         = x._2._2
+
+                            // var ranking         = newDist + (single_node_count * (defaultRank / total_vertices)) 
+                            val ranking         = (restartProb * defaultRank) + (dampingFactor * newDist)
+
+                            if (!params.converge_map(id) && (oldDist - ranking).abs > params.converge) {
+                                params.ranking_map(id)      = ranking
+                                (id, (txt, params.neighborProb_map(id), ranking, params.restartProb_map(id), order + 1))
+                            } else {
+                                params.converge_map(id) = true
+                                (id, (txt, params.neighborProb_map(id), oldDist, params.restartProb_map(id), order))
+                            }
+                        })
+
+                    val mergeVertices = g.vertices.union(newVertices).reduceByKey(
+                        (a, b) => if (a._5 >= b._5) a else b
+                    ).collect().toMap
+                    g = g.mapVertices((id, attr) => mergeVertices(id))
+
+                    var converge_count = 0
+                    params.converge_map.foreach(
+                        x => if (x._2) converge_count += 1
+                    )
+
+                    if (converge_count >= subGraphVertices || subGraphVertices <= 1) {
+                        loop.break
+                    }
                 }
             }
-            writeToFile(params.ranking_map.mkString("\n") + "\n\n")
+            result_ranking_map = result_ranking_map ++ params.ranking_map.toSeq
         }
+        writeToFile(result_ranking_map.sortBy(_._2).mkString("\n") + "\n\n")
+        writeToFile("===== Compare to Standard PageRank \n\n")
+        writeToFile(graph.pageRank(params.converge).vertices.collect().sortBy(_._2)
+            .mkString("\n") + "\n\n")
     }
 }
