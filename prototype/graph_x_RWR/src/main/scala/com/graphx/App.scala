@@ -180,7 +180,7 @@ object App {
         for (group <- connected_groups.collect()) {
             val subGraph            = graph.subgraph(vpred = (vid, attr) => group._2.contains(vid))
             val subGraphVertices    = subGraph.vertices.count()
-            val defaultRank         = 1f
+            val defaultRank         = 1f / total_vertices.toFloat
             val defaultRestartVec   = 1f / total_vertices.toFloat
             // Build a quick search map
 
