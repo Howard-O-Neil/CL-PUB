@@ -213,30 +213,8 @@ object App {
             randNeighborProb()
             randResetProb()
 
-            // for (i <- 1 to 100) {
-            //     randNeighborProb()
-            //     randResetProb()
-
-            //     writeToFile(params.neighborProb_map.mkString("\n") + "\n\n")
-            //     // writeToFile(params.restartProb_map.mkString("\n") + "\n\n")
-            // }
-
-            // sys.exit
-
             var g: Graph[(String, Float, Int, Float), Double] = subGraph.mapVertices((id, attr) =>
                 (attr._1, params.neighborProb_map(id), 0, params.restartProb_map(id)))
-
-            // for (i <- 1 to 100) {
-            //     randNeighborProb()
-            //     randResetProb()
-
-            //     g = g.mapVertices((id, attr) =>
-            //         (attr._1, params.neighborProb_map(id), attr._3, params.restartProb_map(id)))
-                
-            //     writeToFile(g.vertices.collect().mkString("\n") + "\n\n")
-            // }
-
-            // sys.exit
 
             // Experimental
             // the idea is to somehow precalculate maxStep of walker 
@@ -256,13 +234,10 @@ object App {
                                 case (key, value) => if (value) converge_count += 1
                             }
 
-                            // writeToFile("Converge count: " + converge_count + "\n")
-
                             if (converge_count < subGraphVertices) {
                                 if (!params.restart) {
                                     if (triplet.srcAttr._4 <= restartProb) {
                                         params.restart = true
-                                        // writeToFile("Restarting...\n")
                                     }
                                 }
 
@@ -288,7 +263,6 @@ object App {
                                         (params.ranking_map(triplet.srcId) - ranking).abs > params.converge) {
                                         params.ranking_map(triplet.srcId)  = ranking
                                     } else {
-                                        // writeToFile("Detected: " + triplet.srcId + "\n")
                                         params.converge_map(triplet.srcId) = true
                                     }
                                     triplet.sendToSrc(triplet.srcAttr._3 + 1)
@@ -301,9 +275,6 @@ object App {
                     )
                     params.restart = false
 
-                    // writeToFile("Converage State: ...\n")
-                    // writeToFile(params.converge_map.mkString("\n") + "\n\n")
-                    // writeToFile(params.converge_map.mkString("\n") + "\n\n")
                     if (params.is_converge || subGraphVertices <= 1) {
                         loop.break
                     }
@@ -319,7 +290,6 @@ object App {
                         (attr._1, params.neighborProb_map(id), attr._3, params.restartProb_map(id)))
 
                     g.vertices.collect()
-                    // writeToFile(g.vertices.collect().mkString("\n") + "\n\n")
                 }
             }
             writeToFile(params.ranking_map.mkString("\n") + "\n\n")
