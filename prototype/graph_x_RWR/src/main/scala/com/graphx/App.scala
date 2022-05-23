@@ -22,7 +22,7 @@ object App_params {
     var restartProb_map     = collection.mutable.Map[Long, Float]()
 
     // Converage concept
-    val converge        = 0.000001f
+    val converge        = 0.001f
     var is_converge     = false
     var restart         = false
 
@@ -180,8 +180,8 @@ object App {
         for (group <- connected_groups.collect()) {
             val subGraph            = graph.subgraph(vpred = (vid, attr) => group._2.contains(vid))
             val subGraphVertices    = subGraph.vertices.count()
-            val defaultRank         = 1f / total_vertices.toFloat
-            
+            val defaultRank         = 1f
+            val defaultRestartVec   = 1f / total_vertices.toFloat
             // Build a quick search map
 
             params.neighbor_map_in     = collection.mutable.Map[Long, List[Long]]()
@@ -198,7 +198,10 @@ object App {
                 params.restartProb_map      +=  (neighbor._1 -> 0f)
 
                 if (neighbor._2.toList.length <= 0) {
-                    params.ranking_map      +=  (neighbor._1 -> restartProb * defaultRank)
+                    val ranking = (restartProb * defaultRestartVec) 
+                        + (dampingFactor * ( (single_node_count - 1) * (defaultRank / total_vertices) ))
+                        
+                    params.ranking_map      +=  (neighbor._1 -> ranking)
                 } else {
                     params.ranking_map      +=  (neighbor._1 -> defaultRank)
                 }
@@ -246,9 +249,8 @@ object App {
                             val order           = x._2._1._5
                             val newDist         = x._2._2
 
-                            // var ranking         = newDist + (single_node_count * (defaultRank / total_vertices)) 
-                            val ranking         = (restartProb * defaultRank) + (dampingFactor * newDist)
-
+                            var ranking         = newDist + (single_node_count * (defaultRank / total_vertices))
+                            ranking             = (restartProb * defaultRestartVec) + (dampingFactor * newDist)
                             if (!params.converge_map(id) && (oldDist - ranking).abs > params.converge) {
                                 params.ranking_map(id)      = ranking
                                 (id, (txt, params.neighborProb_map(id), ranking, params.restartProb_map(id), order + 1))
