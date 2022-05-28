@@ -24,11 +24,11 @@
     </property>
     <property>
         <name>yarn.nodemanager.local-dirs</name>
-        <value>file:///home/hadoop/hdfs/yn_local1,file:///home/hadoop/hdfs/yn_local2</value>
+        <value>file:///home/hadoop/hdfs/yn_local1</value>
     </property>
     <property>
         <name>yarn.nodemanager.log-dirs</name>
-        <value>file:///home/hadoop/hdfs/yn_log1,file:///home/hadoop/hdfs/yn_log2</value>
+        <value>file:///home/hadoop/hdfs/yn_log1</value>
     </property>
     <property>
         <name>yarn.nodemanager.log.retain-seconds</name>
@@ -36,7 +36,7 @@
     </property>
     <property>
         <name>yarn.nodemanager.remote-app-log-dir</name>
-        <value>file:///home/hadoop/hdfs/yn_remote_app_log1,file:///home/hadoop/hdfs/yn_remote_app_log2</value>
+        <value>file:///home/hadoop/hdfs/yn_remote_app_log1</value>
     </property>
     <property>
         <name>yarn.nodemanager.remote-app-log-dir-suffix</name>
@@ -56,11 +56,11 @@
     </property>
     <property>
         <name>yarn.nodemanager.resource.cpu-vcores</name>
-        <value>1</value>
+        <value>2</value>
     </property>
     <property>
         <name>yarn.nodemanager.resource.memory-mb</name>
-        <value>4096</value>
+        <value>6144</value>
     </property>
 
     <!-- Resource manager info -->

@@ -17,8 +17,9 @@ object App {
         out.close()
     }
 
-    def filterMessage(src: List[List[VertexId]], dst: List[List[VertexId]]): List[List[VertexId]] = {
+    def filterMessage(src: List[List[VertexId]], dst: List[List[VertexId]]): (List[List[VertexId]], List[Int]) = {
         var result: List[(List[VertexId], Int)] = List()
+        var removedIdx: List[Int]               = List()
         // Suppose we send full src to dst
         // Then check to filter
         result = result ::: src.zipWithIndex
@@ -34,10 +35,22 @@ object App {
                         if (srcItem(i) == dstItem(i)) similarCount += 1
                     }
 
-                    if (similarCount == dstItem.size)
+                    if (similarCount == dstItem.size) {
+                        removedIdx = removedIdx ::: List(srcIdx)
                         result = result.filter(item => item._2 != srcIdx)
+                    }
                 }
             }
+        }
+        return (result.map(item => item._1), removedIdx)
+    }
+
+    def filterSrcIdx(src: List[Double], idx: List[Int]): List[Double] = {
+        var result: List[(Double, Int)] = List()
+        result = result ::: src.zipWithIndex
+
+        for (srcIdx <- idx) {
+            result = result.filter(item => item._2 != srcIdx)
         }
         return result.map(item => item._1)
     }
@@ -118,40 +131,50 @@ object App {
         val src_connected   = connected_groups.filter(group => group._2.contains(src)).collect()(0)._2
         val subgraph        = graph.subgraph(vpred = (vid, attr) => src_connected.contains(vid))          
 
-        var g: Graph[(String, Int, List[List[VertexId]]), Double] =
+        var g: Graph[(String, Int, List[List[VertexId]], List[Double]), Double] =
             subgraph.mapVertices((id, attr) =>
-                if (id == src) (attr._1, 1, List(List(id)))
-                else (attr._1, 0, List()))
+                if (id == src) (attr._1, 1, List(List(id)), List(0d))
+                else (attr._1, 0, List(), List()))
 
         val loop = new Breaks
 
         loop.breakable {
             while (true) {
-                val msgs = g.aggregateMessages[List[List[VertexId]]] (
+                val msgs = g.aggregateMessages[(List[List[VertexId]], List[Double])] (
                     triplet => 
                         if (triplet.dstAttr._2 == 0) {
-                            var result: List[List[VertexId]] = List()
-                            
+                            var result: List[List[VertexId]]    = List()
+                            var path_w: List[Double]            = List()
+
                             for (itemList <- triplet.srcAttr._3) {
-                                val newList = itemList ::: List(triplet.dstId)
-                                result = result ::: List(newList)
+                                val newList     = itemList ::: List(triplet.dstId)
+                                result          = result ::: List(newList)
+                            }
+                            for (weight <- triplet.srcAttr._4) {
+                                val newWeight   = weight + triplet.attr
+                                path_w          = path_w ::: List(newWeight)
                             }
 
-                            val sendMessage = filterMessage(result, triplet.dstAttr._3)
+                            val (sendMessage, removedIdx)   = filterMessage(result, triplet.dstAttr._3)
+                            val sendPathW                   = filterSrcIdx(path_w, removedIdx)
 
                             if (sendMessage.size > 0)
-                                triplet.sendToDst(result)
+                                triplet.sendToDst((sendMessage, sendPathW))
                         },
-                    (a, b) => a ::: filterMessage(b, a)
+                    (a, b) => (a._1 ::: b._1, a._2 ::: b._2)
                 )
                 if (msgs.count() <= 0) loop.break
-                
+
                 g = g.ops.joinVertices(msgs) (
                     (id, oldAttr, newDist) =>
-                        (oldAttr._1, oldAttr._2, oldAttr._3 ::: filterMessage(newDist, oldAttr._3))
+                        (oldAttr._1, oldAttr._2, oldAttr._3 ::: newDist._1, oldAttr._4 ::: newDist._2)
                 )
             }
         }
-        writeToFile(g.vertices.collect.mkString("\n"))
+
+        writeToFile("===== Path\n\n")
+        writeToFile(g.vertices.map(item => (item._1, item._2._3)).collect.mkString("\n") + "\n\n")
+        writeToFile("===== Weights\n\n")
+        writeToFile(g.vertices.map(item => (item._1, item._2._4)).collect.mkString("\n") + "\n\n")
     }
 }

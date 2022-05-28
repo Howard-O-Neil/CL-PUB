@@ -45,7 +45,7 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-source = "/recsys/data/arnet/citation/dblpv13.json"
+source = "/recsys/dataset/arnet/citation/dblpv13.json"
 
 INSERT_THRESHOLD = 250000
 
@@ -72,19 +72,17 @@ with open(source, "r") as test_read:
     def insert_df(dept):
         global count_parquet
 
-        deptSchema = StructType([
+        deptSchema = StructType([       
             StructField('_id', StringType(), False),
             StructField('_status', IntegerType(), False),
             StructField('_timestamp', LongType(), False),
-            StructField('author_id', StringType(), False),
-            StructField('author_name', StringType(), False),
-            StructField('paper_id', StringType(), False),
-            StructField('paper_title', StringType(), False),
-            StructField('year', FloatType(), False),
+            StructField('id', StringType(), False),
+            StructField('title', StringType(), False),
+            StructField('year', FloatType(), True),
         ])
 
         deptDF = spark.createDataFrame(data=dept, schema = deptSchema)
-        deptDF.write.format("parquet").save(f"/data/recsys/arnet/tables/published_history/production/part-{count_parquet}")
+        deptDF.write.format("parquet").save(f"/data/recsys/arnet/tables/bibtex/production/part-{count_parquet}")
         count_parquet += 1
 
     def insert_data(list_data):
@@ -95,24 +93,35 @@ with open(source, "r") as test_read:
             composed_data = []
             flag = False
             for record in chunk:
-                uid = str(uuid.uuid1())
+                if 'title' not in record or '_id' not in record:
+                    continue
 
-                composed_data.append((uid, 0, int(time.time()), \
-                    record["author_id"], record["author_name"], \
-                    record["paper_id"], record["paper_title"], record["year"]))
+                title = record['title']
+                _id = record['_id']
+                
+                year = -1.0
+                if 'year' in record:
+                    year = float(record['year'])
 
-                print(f"[ ===== Checked Pair Author-Paper: ({record['author_id']}, {record['paper_id']}) ===== ]")
+                uid = str(uuid.uuid4())
+                while uid in cached_uuid:
+                    uid = str(uuid.uuid4())
+                cached_uuid[uid] = True
+
+                composed_data.append((uid, 0, int(time.time()), _id, title, year))
+
+                print(f"[ ===== Checked bibtex: {title} ===== ]")
                 flag = True
 
             if flag == False:
-                print(f"[ ===== [Chunk {cid + 1}] NO Pair Author-Paper Inserted ===== ]")
+                print(f"[ ===== [Chunk {cid + 1}] NO bibtex Inserted ===== ]")
                 continue
 
-            print(f"[ ===== [Chunk {cid + 1}] BATCH Pair Author-Paper Inserting ... ===== ]")
+            print(f"[ ===== [Chunk {cid + 1}] BATCH bibtex Inserting ... ===== ]")
 
             insert_df(composed_data)
 
-            print(f"[ ===== [Chunk {cid + 1}] BATCH Pair Author-Paper Inserted ... ===== ]")
+            print(f"[ ===== [Chunk {cid + 1}] BATCH bibtex Inserted ... ===== ]")
 
     # State = 0 -> searching start json
     # State = 1 -> searching end json
@@ -123,30 +132,9 @@ with open(source, "r") as test_read:
         if state == 1:
             if line[0] == "}":
                 data = json.loads(current_json + "}")
-                
-                if 'title' in data and '_id' in data:
-                    author_data = {}
-                    if 'authors' in data:
-                        author_data = data['authors']
-                    
-                        year = -1.0
-                        if 'year' in data:
-                            year = float(data['year'])
+                list_json.append(data)
 
-                        for author in author_data:
-                            if 'name' not in author or '_id' not in author:
-                                continue
-
-                            list_json.append({
-                                "_id": "", "_status": 0, "_timestamp": 0,
-                                "author_id"     : author["_id"],
-                                "author_name"   : author["name"],
-                                "paper_id"      : data["_id"],
-                                "paper_title"   : data["title"],
-                                "year"          : year
-                            })
-
-                            print(f"[ ===== Pair Author-Paper batch count: {len(list_json)} ===== ]")
+                print(f"[ ===== Bibtex batch count: {len(list_json)} ===== ]")
 
                 if len(list_json) >= INSERT_THRESHOLD:
                     insert_data(list_json)

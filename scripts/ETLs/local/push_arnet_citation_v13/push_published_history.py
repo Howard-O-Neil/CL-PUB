@@ -24,7 +24,6 @@ import copy
 import uuid
 
 os.environ["JAVA_HOME"] = "/opt/corretto-8"
-os.environ["HADOOP_CONF_DIR"] = "/recsys/prototype/spark_submit/hdfs_cfg"
 
 JAVA_LIB = "/opt/corretto-8/lib"
 
@@ -32,10 +31,6 @@ spark = SparkSession.builder \
     .config("spark.app.name", "Recsys") \
     .config("spark.master", "local[*]") \
     .config("spark.submit.deployMode", "client") \
-    .config("spark.yarn.appMasterEnv.SPARK_HOME", "/opt/spark") \
-    .config("spark.yarn.appMasterEnv.PYSPARK_PYTHON", "/virtual/python/bin/python") \
-    .config("spark.yarn.jars", "hdfs://128.0.5.3:9000/lib/java/spark/jars/*.jar") \
-    .config("spark.sql.legacy.allowNonEmptyLocationInCTAS", "true") \
     .getOrCreate()
 
 count_parquet = 0
@@ -45,7 +40,7 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-source = "/recsys/data/arnet/citation/dblpv13.json"
+source = "/recsys/dataset/arnet/citation/dblpv13.json"
 
 INSERT_THRESHOLD = 250000
 
@@ -72,16 +67,20 @@ with open(source, "r") as test_read:
     def insert_df(dept):
         global count_parquet
 
-        deptSchema = StructType([       
+        deptSchema = StructType([
             StructField('_id', StringType(), False),
             StructField('_status', IntegerType(), False),
-            StructField('_timestamp', LongType(), False),
-            StructField('id', StringType(), False),
-            StructField('name', StringType(), False),
+            StructField('_order', IntegerType(), False),
+            StructField('author_id', StringType(), False),
+            StructField('author_name', StringType(), False),
+            StructField('author_org', StringType(), False),
+            StructField('paper_id', StringType(), False),
+            StructField('paper_title', StringType(), False),
+            StructField('year', FloatType(), False),
         ])
 
         deptDF = spark.createDataFrame(data=dept, schema = deptSchema)
-        deptDF.write.format("parquet").save(f"/data/recsys/arnet/tables/author/production/part-{count_parquet}")
+        deptDF.write.format("parquet").save(f"/home/hadoop/spark/arnet/tables/published_history/production/part-{count_parquet}")
         count_parquet += 1
 
     def insert_data(list_data):
@@ -92,31 +91,24 @@ with open(source, "r") as test_read:
             composed_data = []
             flag = False
             for record in chunk:
-                if 'name' not in record or '_id' not in record:
-                    continue
+                uid = str(uuid.uuid1())
 
-                name = record['name']
-                _id = record['_id']
-                
-                uid = str(uuid.uuid4())
-                while uid in cached_uuid:
-                    uid = str(uuid.uuid4())
-                cached_uuid[uid] = True
+                composed_data.append((uid, 0, int(time.time()), \
+                    record["author_id"], record["author_name"], \
+                    record["paper_id"], record["paper_title"], record["year"]))
 
-                composed_data.append((uid, 0, int(time.time()), _id, name))
-
-                print(f"[ ===== Checked author: {name} ===== ]")
+                print(f"[ ===== Checked Pair Author-Paper: ({record['author_id']}, {record['paper_id']}) ===== ]")
                 flag = True
 
             if flag == False:
-                print(f"[ ===== [Chunk {cid + 1}] NO author Inserted ===== ]")
+                print(f"[ ===== [Chunk {cid + 1}] NO Pair Author-Paper Inserted ===== ]")
                 continue
 
-            print(f"[ ===== [Chunk {cid + 1}] BATCH author Inserting ... ===== ]")
+            print(f"[ ===== [Chunk {cid + 1}] BATCH Pair Author-Paper Inserting ... ===== ]")
 
             insert_df(composed_data)
 
-            print(f"[ ===== [Chunk {cid + 1}] BATCH author Inserted ... ===== ]")
+            print(f"[ ===== [Chunk {cid + 1}] BATCH Pair Author-Paper Inserted ... ===== ]")
 
     # State = 0 -> searching start json
     # State = 1 -> searching end json
@@ -128,14 +120,29 @@ with open(source, "r") as test_read:
             if line[0] == "}":
                 data = json.loads(current_json + "}")
                 
-                author_data = {}
-                if 'authors' in data:
-                    author_data = data['authors']
-                
-                for author in author_data:
-                    list_json.append(author)
+                if 'title' in data and '_id' in data:
+                    author_data = {}
+                    if 'authors' in data:
+                        author_data = data['authors']
+                    
+                        year = -1.0
+                        if 'year' in data:
+                            year = float(data['year'])
 
-                print(f"[ ===== Author batch count: {len(list_json)} ===== ]")
+                        for author in author_data:
+                            if 'name' not in author or '_id' not in author:
+                                continue
+
+                            list_json.append({
+                                "_id": "", "_status": 0, "_timestamp": 0,
+                                "author_id"     : author["_id"],
+                                "author_name"   : author["name"],
+                                "paper_id"      : data["_id"],
+                                "paper_title"   : data["title"],
+                                "year"          : year
+                            })
+
+                            print(f"[ ===== Pair Author-Paper batch count: {len(list_json)} ===== ]")
 
                 if len(list_json) >= INSERT_THRESHOLD:
                     insert_data(list_json)

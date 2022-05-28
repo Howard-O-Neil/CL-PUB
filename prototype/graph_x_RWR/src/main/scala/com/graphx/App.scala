@@ -14,21 +14,16 @@ import org.apache.spark.sql.{functions => sparkf}
 import org.apache.spark.sql.{types => sparkt}
 
 object App_params {
-    var neighbor_map_in     = collection.mutable.Map[Long, List[Long]]()
     var neighbor_map_out    = collection.mutable.Map[Long, List[Long]]()
     var ranking_map         = collection.mutable.Map[Long, Float]()
-    var converge_map        = collection.mutable.Map[Long, Boolean]()
     var neighborProb_map    = collection.mutable.Map[Long, Float]()
     var restartProb_map     = collection.mutable.Map[Long, Float]()
 
-    // Converage concept
-    val converge        = 0.001f
-    var is_converge     = false
     var restart         = false
 
-    // Experimental max Step concept
+    // RWR max Step concept
     // I haven't not yet found good formula on calculating MaxStep or MaxSuperStep
-    var maxStep         = Double.PositiveInfinity
+    var maxStep         = 20
     var step            = 0
 }
 
@@ -58,9 +53,11 @@ object App {
         for (i <- 1 to params.neighborProb_map.size)
             seedData.add(sparkSQL.Row(i))
 
+        val max_rand    = 10f
         val dfr                 = spark.createDataFrame(seedData, schema)
         val randomValues_df     = dfr.select("id")
-                .withColumn("uniform", sparkf.rand(System.nanoTime()))
+                // .withColumn("uniform", sparkf.rand(System.nanoTime()))
+                .withColumn("uniform", sparkf.floor(sparkf.rand(System.nanoTime()) * max_rand) / max_rand)
                 .withColumn("normal", sparkf.randn(System.nanoTime()))
         val randomValues = randomValues_df.collect().map(
             item => item(1).asInstanceOf[Double].toFloat)
@@ -81,9 +78,11 @@ object App {
         for (i <- 1 to params.restartProb_map.size)
             seedData.add(sparkSQL.Row(i))
 
+        val max_rand    = 10000f
         val dfr                 = spark.createDataFrame(seedData, schema)
         val randomValues_df     = dfr.select("id")
-                .withColumn("uniform", sparkf.rand(System.nanoTime()))
+                // .withColumn("uniform", sparkf.rand(System.nanoTime()))
+                .withColumn("uniform", sparkf.floor(sparkf.rand(System.nanoTime()) * max_rand) / max_rand)
                 .withColumn("normal", sparkf.randn(System.nanoTime()))
         val randomValues = randomValues_df.collect().map(
             item => item(1).asInstanceOf[Double].toFloat)
@@ -180,20 +179,17 @@ object App {
         for (group <- connected_groups.collect()) {
             val subGraph            = graph.subgraph(vpred = (vid, attr) => group._2.contains(vid))
             val subGraphVertices    = subGraph.vertices.count()
-            val defaultRank         = 1f / total_vertices.toFloat
+            val defaultRank         = 1f
             val defaultRestartVec   = 1f / total_vertices.toFloat
             // Build a quick search map
 
-            params.neighbor_map_in     = collection.mutable.Map[Long, List[Long]]()
             params.neighbor_map_out    = collection.mutable.Map[Long, List[Long]]()
             params.ranking_map         = collection.mutable.Map[Long, Float]()
-            params.converge_map        = collection.mutable.Map[Long, Boolean]()
             params.neighborProb_map    = collection.mutable.Map[Long, Float]()
             params.restartProb_map     = collection.mutable.Map[Long, Float]()
 
             for (neighbor <- subGraph.ops.collectNeighborIds(EdgeDirection.Out).collect()) {
                 params.neighbor_map_out     +=  (neighbor._1 -> neighbor._2.toList)
-                params.converge_map         +=  (neighbor._1 -> false)
                 params.neighborProb_map     +=  (neighbor._1 -> 0f)
                 params.restartProb_map      +=  (neighbor._1 -> 0f)
 
@@ -206,10 +202,6 @@ object App {
                     params.ranking_map      +=  (neighbor._1 -> defaultRank)
                 }
             }
-            
-            for (neighbor <- subGraph.ops.collectNeighborIds(EdgeDirection.In).collect()) {
-                params.neighbor_map_in     += (neighbor._1 -> neighbor._2.toList)
-            }
 
             randNeighborProb()
             randResetProb()
@@ -217,19 +209,22 @@ object App {
             var g: Graph[(String, Float, Float, Float, Int), Double] = subGraph.mapVertices((id, attr) =>
                 (attr._1, params.neighborProb_map(id), defaultRank, params.restartProb_map(id), 0))
 
-            params.is_converge  = false
             params.restart      = false
+            params.step         = 0
 
             val loop = new Breaks
             loop.breakable {
                 while (true) {
                     val msgs        = g.aggregateMessages[Float] (
                         triplet => {
-                            var outlinks = params.neighbor_map_out(triplet.srcId)
+                            // var outlinks = params.neighbor_map_out(triplet.srcId)
+                            // triplet.sendToDst(triplet.srcAttr._3 / outlinks.length)
 
-                            if (outlinks.length <= 1) {
-                                triplet.sendToDst(triplet.srcAttr._3 / total_vertices)
-                            } else {
+                            if (!params.restart && triplet.srcAttr._4 <= restartProb)
+                                params.restart = true
+
+                            if (triplet.dstAttr._5 < 3 || (!params.restart && triplet.srcAttr._2 <= dampingFactor)) {
+                                var outlinks = params.neighbor_map_out(triplet.srcId)
                                 triplet.sendToDst(triplet.srcAttr._3 / outlinks.length)
                             }
                         },
@@ -247,39 +242,37 @@ object App {
                             val oldDist         = x._2._1._3
                             val restart_prop    = x._2._1._4
                             val order           = x._2._1._5
-                            val newDist         = x._2._2
-
+                            var newDist         = x._2._2
+                            
                             var ranking         = newDist + (single_node_count * (defaultRank / total_vertices))
-                            ranking             = (restartProb * defaultRestartVec) + (dampingFactor * newDist)
-                            if (!params.converge_map(id) && (oldDist - ranking).abs > params.converge) {
-                                params.ranking_map(id)      = ranking
-                                (id, (txt, params.neighborProb_map(id), ranking, params.restartProb_map(id), order + 1))
-                            } else {
-                                params.converge_map(id) = true
-                                (id, (txt, params.neighborProb_map(id), oldDist, params.restartProb_map(id), order))
-                            }
+                            ranking             = (restartProb * defaultRestartVec) + (dampingFactor * ranking)
+                            params.ranking_map(id)      = ranking
+                            (id, (txt, params.neighborProb_map(id), ranking, params.restartProb_map(id), order + 1))
                         })
 
                     val mergeVertices = g.vertices.union(newVertices).reduceByKey(
                         (a, b) => if (a._5 >= b._5) a else b
-                    ).collect().toMap
-                    g = g.mapVertices((id, attr) => mergeVertices(id))
-
-                    var converge_count = 0
-                    params.converge_map.foreach(
-                        x => if (x._2) converge_count += 1
                     )
 
-                    if (converge_count >= subGraphVertices || subGraphVertices <= 1) {
+                    g = g.ops.joinVertices(mergeVertices) {
+                        (id, oldAttr, newAttr) => newAttr
+                    }
+
+                    params.restart = false
+                    params.step += 1
+                    if (subGraphVertices <= 1 || params.step >= params.maxStep) {
                         loop.break
                     }
+
+                    // For terminal logging while waiting
+                    g.vertices.take(5)
                 }
             }
             result_ranking_map = result_ranking_map ++ params.ranking_map.toSeq
         }
-        writeToFile(result_ranking_map.sortBy(_._2).mkString("\n") + "\n\n")
+        writeToFile(result_ranking_map.sortBy(_._2) .mkString("\n") + "\n\n")
         writeToFile("===== Compare to Standard PageRank \n\n")
-        writeToFile(graph.pageRank(params.converge).vertices.collect().sortBy(_._2)
+        writeToFile(graph.pageRank(0.01f).vertices.collect().sortBy(_._2)
             .mkString("\n") + "\n\n")
     }
 }

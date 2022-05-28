@@ -45,7 +45,7 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-source = "/recsys/data/arnet/citation/dblpv13.json"
+source = "/recsys/dataset/arnet/citation/dblpv13.json"
 
 INSERT_THRESHOLD = 250000
 
@@ -72,58 +72,51 @@ with open(source, "r") as test_read:
     def insert_df(dept):
         global count_parquet
 
-        deptSchema = StructType([
+        deptSchema = StructType([       
             StructField('_id', StringType(), False),
             StructField('_status', IntegerType(), False),
             StructField('_timestamp', LongType(), False),
-            # My mistake, this id will be skip in the merge step
             StructField('id', StringType(), False),
-            # Suppose each name is different for each organization
             StructField('name', StringType(), False),
         ])
 
         deptDF = spark.createDataFrame(data=dept, schema = deptSchema)
-        deptDF.write.format("parquet").save(f"/data/recsys/arnet/tables/organization/production/part-{count_parquet}")
+        deptDF.write.format("parquet").save(f"/data/recsys/arnet/tables/author/production/part-{count_parquet}")
         count_parquet += 1
 
     def insert_data(list_data):
         cached_uuid = {}
-        cached_id = {}
 
         for cid, chunk in enumerate(chunks(list_data, INSERT_THRESHOLD)):
 
             composed_data = []
             flag = False
             for record in chunk:
-                if 'org' not in record:
+                if 'name' not in record or '_id' not in record:
                     continue
 
-                name = record['org']
+                name = record['name']
+                _id = record['_id']
                 
                 uid = str(uuid.uuid4())
                 while uid in cached_uuid:
                     uid = str(uuid.uuid4())
                 cached_uuid[uid] = True
 
-                _id = str(uuid.uuid4())
-                while _id in cached_id:
-                    _id = str(uuid.uuid4())
-                cached_id[_id] = True
-
                 composed_data.append((uid, 0, int(time.time()), _id, name))
 
-                print(f"[ ===== Checked organization: {name} ===== ]")
+                print(f"[ ===== Checked author: {name} ===== ]")
                 flag = True
 
             if flag == False:
-                print(f"[ ===== [Chunk {cid + 1}] NO organization Inserted ===== ]")
+                print(f"[ ===== [Chunk {cid + 1}] NO author Inserted ===== ]")
                 continue
 
-            print(f"[ ===== [Chunk {cid + 1}] BATCH organization Inserting ... ===== ]")
+            print(f"[ ===== [Chunk {cid + 1}] BATCH author Inserting ... ===== ]")
 
             insert_df(composed_data)
 
-            print(f"[ ===== [Chunk {cid + 1}] BATCH organization Inserted ... ===== ]")
+            print(f"[ ===== [Chunk {cid + 1}] BATCH author Inserted ... ===== ]")
 
     # State = 0 -> searching start json
     # State = 1 -> searching end json
@@ -140,9 +133,6 @@ with open(source, "r") as test_read:
                     author_data = data['authors']
                 
                 for author in author_data:
-                    if 'org' not in author:
-                        continue
-
                     list_json.append(author)
 
                 print(f"[ ===== Author batch count: {len(list_json)} ===== ]")

@@ -155,12 +155,8 @@ down-hdfs:
 
 	@echo "[Backup images checkpoint1...]"
 	eval $(mv_cp_nn1)
-	@echo "[Backup images checkpoint2...]"
-	eval $(mv_cp_nn2)
 	@echo "[Backup edits checkpoint1...]"
 	eval $(mv_cp_edits1)
-	@echo "[Backup edits checkpoint2...]"
-	eval $(mv_cp_edits2)
 
 	@echo "[Stopping hdfs...]"
 	eval $(stop_dfs)

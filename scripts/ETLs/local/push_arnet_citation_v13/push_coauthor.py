@@ -24,7 +24,6 @@ import copy
 import uuid
 
 os.environ["JAVA_HOME"] = "/opt/corretto-8"
-os.environ["HADOOP_CONF_DIR"] = "/recsys/prototype/spark_submit/hdfs_cfg"
 
 JAVA_LIB = "/opt/corretto-8/lib"
 
@@ -32,10 +31,6 @@ spark = SparkSession.builder \
     .config("spark.app.name", "Recsys") \
     .config("spark.master", "local[*]") \
     .config("spark.submit.deployMode", "client") \
-    .config("spark.yarn.appMasterEnv.SPARK_HOME", "/opt/spark") \
-    .config("spark.yarn.appMasterEnv.PYSPARK_PYTHON", "/virtual/python/bin/python") \
-    .config("spark.yarn.jars", "hdfs://128.0.5.3:9000/lib/java/spark/jars/*.jar") \
-    .config("spark.sql.legacy.allowNonEmptyLocationInCTAS", "true") \
     .getOrCreate()
 
 count_parquet = 0
@@ -45,9 +40,9 @@ def chunks(lst, n):
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
-source = "/recsys/data/arnet/citation/dblpv13.json"
+source = "/recsys/dataset/arnet/citation/dblpv13.json"
 
-INSERT_THRESHOLD = 250000
+INSERT_THRESHOLD = 800000
 
 with open(source, "r") as test_read:
     list_json = []
@@ -88,13 +83,13 @@ with open(source, "r") as test_read:
         ])
 
         deptDF = spark.createDataFrame(data=dept, schema = deptSchema)
-        deptDF.write.format("parquet").save(f"/data/recsys/arnet/tables/coauthor/production/part-{count_parquet}")
+        deptDF.write.format("parquet").save(f"/home/hadoop/spark/arnet/tables/coauthor/production/part-{count_parquet}")
         count_parquet += 1
 
     def insert_data(list_data):
         cached_uuid = {}
 
-        for cid, chunk in enumerate(chunks(list_data, INSERT_THRESHOLD)):
+        for cid, chunk in enumerate(chunks(list_data, len(list_data))):
 
             composed_data = []
             flag = False

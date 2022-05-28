@@ -63,10 +63,11 @@ services:
     # build from tensorflow image, add some packages, spark + corretto8 + rapids
     image: mingkhoi/recsys:fixbug-version1
     volumes:
+      - /virtual/data/recsys/metadata/spark-standalone:/home/hadoop/spark:rw
       - ./requirement.txt:/recsys/requirement.txt:rw
       - ./model:/recsys/model:rw
       - ./prototype:/recsys/prototype:rw
-      - ./data:/recsys/data:rw
+      - /virtual/data/dataset:/recsys/dataset:rw
       - ./notebook:/recsys/notebook:rw
 
     # runtime: nvidia
