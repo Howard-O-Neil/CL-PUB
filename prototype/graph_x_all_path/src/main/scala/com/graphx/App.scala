@@ -56,15 +56,7 @@ object App {
     }
 
     def main(args: Array[String]) = {
-        
-        val spark = SparkSession.builder
-            .config("spark.app.name", "Recsys")
-            .config("spark.master", "local[*]")
-            .config("spark.submit.deployMode", "client")
-            .config("spark.yarn.jars", "hdfs://128.0.5.3:9000/lib/java/spark/jars/*.jar")
-            .config("spark.sql.legacy.allowNonEmptyLocationInCTAS", "true")
-            .getOrCreate()
-
+        val spark = SparkSession.builder.getOrCreate()
         val sc = spark.sparkContext
 
         // Create an RDD for the vertices
@@ -125,56 +117,56 @@ object App {
             (a, b) => a ::: b
         )
 
-        val src: VertexId = 1L
-        val dst: VertexId = 8L
+        // val src: VertexId = 7L
+        // val dst: VertexId = 8L
 
-        val src_connected   = connected_groups.filter(group => group._2.contains(src)).collect()(0)._2
-        val subgraph        = graph.subgraph(vpred = (vid, attr) => src_connected.contains(vid))          
+        // val src_connected   = connected_groups.filter(group => group._2.contains(src)).collect()(0)._2
+        // val subgraph        = graph.subgraph(vpred = (vid, attr) => src_connected.contains(vid))      
 
         var g: Graph[(String, Int, List[List[VertexId]], List[Double]), Double] =
-            subgraph.mapVertices((id, attr) =>
-                if (id == src) (attr._1, 1, List(List(id)), List(0d))
-                else (attr._1, 0, List(), List()))
+            graph.mapVertices((id, attr) => (attr._1, 1, List(List(id)), List(0d)))
 
         val loop = new Breaks
 
         loop.breakable {
-            while (true) {
-                val msgs = g.aggregateMessages[(List[List[VertexId]], List[Double])] (
-                    triplet => 
-                        if (triplet.dstAttr._2 == 0) {
-                            var result: List[List[VertexId]]    = List()
-                            var path_w: List[Double]            = List()
+            val msgs = g.aggregateMessages[(List[List[VertexId]], List[Double])] (
+                triplet => {
+                    var result: List[List[VertexId]]    = List()
+                    var path_w: List[Double]            = List()
 
-                            for (itemList <- triplet.srcAttr._3) {
-                                val newList     = itemList ::: List(triplet.dstId)
-                                result          = result ::: List(newList)
-                            }
-                            for (weight <- triplet.srcAttr._4) {
-                                val newWeight   = weight + triplet.attr
-                                path_w          = path_w ::: List(newWeight)
-                            }
+                    for (itemList <- triplet.srcAttr._3) {
+                        val newList     = itemList ::: List(triplet.dstId)
+                        result          = result ::: List(newList)
+                    }
+                    for (weight <- triplet.srcAttr._4) {
+                        val newWeight   = weight + triplet.attr
+                        path_w          = path_w ::: List(newWeight)
+                    }
 
-                            val (sendMessage, removedIdx)   = filterMessage(result, triplet.dstAttr._3)
-                            val sendPathW                   = filterSrcIdx(path_w, removedIdx)
+                    val (sendMessage, removedIdx)   = filterMessage(result, triplet.dstAttr._3)
+                    val sendPathW                   = filterSrcIdx(path_w, removedIdx)
 
-                            if (sendMessage.size > 0)
-                                triplet.sendToDst((sendMessage, sendPathW))
-                        },
-                    (a, b) => (a._1 ::: b._1, a._2 ::: b._2)
-                )
-                if (msgs.count() <= 0) loop.break
+                    if (sendMessage.size > 0)
+                        triplet.sendToDst((sendMessage, sendPathW))
+                },
+                (a, b) => (a._1 ::: b._1, a._2 ::: b._2)
+            )
+            if (msgs.count() <= 0) loop.break
 
-                g = g.ops.joinVertices(msgs) (
-                    (id, oldAttr, newDist) =>
-                        (oldAttr._1, oldAttr._2, oldAttr._3 ::: newDist._1, oldAttr._4 ::: newDist._2)
-                )
-            }
+            g = g.ops.joinVertices(msgs) (
+                (id, oldAttr, newDist) =>
+                    (oldAttr._1, oldAttr._2, oldAttr._3 ::: newDist._1, oldAttr._4 ::: newDist._2)
+            )
         }
+        
+        // writeToFile("===== Path\n\n")
+        // writeToFile(g.vertices.map(item => (item._1, item._2._3)).collect.mkString("\n") + "\n\n")
+        // writeToFile("===== Weights\n\n")
+        // writeToFile(g.vertices.map(item => (item._1, item._2._4)).collect.mkString("\n") + "\n\n")
 
-        writeToFile("===== Path\n\n")
-        writeToFile(g.vertices.map(item => (item._1, item._2._3)).collect.mkString("\n") + "\n\n")
-        writeToFile("===== Weights\n\n")
-        writeToFile(g.vertices.map(item => (item._1, item._2._4)).collect.mkString("\n") + "\n\n")
+        // println("===== Path\n\n")
+        // println(g.vertices.map(item => (item._1, item._2._3)).collect.mkString("\n") + "\n\n")
+        // println("===== Weights\n\n")
+        // println(g.vertices.map(item => (item._1, item._2._4)).collect.mkString("\n") + "\n\n")
     }
 }

@@ -66,6 +66,7 @@ services:
       - /virtual/data/recsys/metadata/spark-standalone:/home/hadoop/spark:rw
       - ./requirement.txt:/recsys/requirement.txt:rw
       - ./model:/recsys/model:rw
+      - ./scripts:/recsys/scripts:rw
       - ./prototype:/recsys/prototype:rw
       - /virtual/data/dataset:/recsys/dataset:rw
       - ./notebook:/recsys/notebook:rw

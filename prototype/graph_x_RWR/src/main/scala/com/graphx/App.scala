@@ -23,7 +23,7 @@ object App_params {
 
     // RWR max Step concept
     // I haven't not yet found good formula on calculating MaxStep or MaxSuperStep
-    var maxStep         = 20
+    var maxStep         = 10
     var step            = 0
 }
 
@@ -48,13 +48,16 @@ object App {
 
     def randNeighborProb() = {
         val schema      = sparkt.StructType(Array(
-                            sparkt.StructField("id", sparkt.IntegerType, false)))
-        val seedData    = new java.util.ArrayList[sparkSQL.Row]()
-        for (i <- 1 to params.neighborProb_map.size)
-            seedData.add(sparkSQL.Row(i))
+                            sparkt.StructField("id", sparkt.IntegerType, false),
+                            sparkt.StructField("draft", sparkt.StringType, false)))
+        var seedData: Seq[(Int, String)] = Seq()
 
+        for (i <- 1 to params.restartProb_map.size)
+            seedData = seedData :+ (i, "")
+
+        val rdd = spark.sparkContext.parallelize(seedData)
         val max_rand    = 10f
-        val dfr                 = spark.createDataFrame(seedData, schema)
+        val dfr                 = spark.createDataFrame(rdd.map(attr => sparkSQL.Row(attr._1, attr._2)), schema)
         val randomValues_df     = dfr.select("id")
                 // .withColumn("uniform", sparkf.rand(System.nanoTime()))
                 .withColumn("uniform", sparkf.floor(sparkf.rand(System.nanoTime()) * max_rand) / max_rand)
@@ -73,13 +76,16 @@ object App {
 
     def randResetProb() = {
         val schema      = sparkt.StructType(Array(
-                            sparkt.StructField("id", sparkt.IntegerType, false)))
-        val seedData    = new java.util.ArrayList[sparkSQL.Row]()
-        for (i <- 1 to params.restartProb_map.size)
-            seedData.add(sparkSQL.Row(i))
+                            sparkt.StructField("id", sparkt.IntegerType, false),
+                            sparkt.StructField("draft", sparkt.StringType, false)))
+        var seedData: Seq[(Int, String)] = Seq()
 
+        for (i <- 1 to params.restartProb_map.size)
+            seedData = seedData :+ (i, "")
+
+        val rdd = spark.sparkContext.parallelize(seedData)
         val max_rand    = 10000f
-        val dfr                 = spark.createDataFrame(seedData, schema)
+        val dfr                 = spark.createDataFrame(rdd.map(attr => sparkSQL.Row(attr._1, attr._2)), schema)
         val randomValues_df     = dfr.select("id")
                 // .withColumn("uniform", sparkf.rand(System.nanoTime()))
                 .withColumn("uniform", sparkf.floor(sparkf.rand(System.nanoTime()) * max_rand) / max_rand)
@@ -112,7 +118,8 @@ object App {
                                 (12L, ("O", 0D)),
                                 (13L, ("Z", 0D)),
                                 (14L, ("T", 0D)),
-                                (15L, ("R", 0D)), (16L, ("S", 0D))))
+                                (15L, ("R", 0D)), (16L, ("S", 0D)),
+                                (17L, ("Q", 0D))))
 
         // Create an RDD for edges
         val relationships: RDD[Edge[Double]] = 
@@ -147,7 +154,9 @@ object App {
                 // OU
                 Edge(12L, 11L, 6D), Edge(11L, 12L, 6D),
                 // RS
-                Edge(16L, 15L, 7D), Edge(15L, 16L, 7D)))
+                Edge(16L, 15L, 7D), Edge(15L, 16L, 7D),
+                // QA
+                Edge(17L, 1L, 9D), Edge(1L, 17L, 9D)))
 
         val graph = Graph(users, relationships)
 
@@ -193,13 +202,10 @@ object App {
                 params.neighborProb_map     +=  (neighbor._1 -> 0f)
                 params.restartProb_map      +=  (neighbor._1 -> 0f)
 
-                if (neighbor._2.toList.length <= 0) {
-                    val ranking = (restartProb * defaultRestartVec) 
-                        + (dampingFactor * ( (single_node_count - 1) * (defaultRank / total_vertices) ))
-                        
-                    params.ranking_map      +=  (neighbor._1 -> ranking)
+                if (neighbor._2.toList.length <= 0) {                        
+                    params.ranking_map      +=  (neighbor._1 -> defaultRestartVec)
                 } else {
-                    params.ranking_map      +=  (neighbor._1 -> defaultRank)
+                    params.ranking_map      +=  (neighbor._1 -> 0f)
                 }
             }
 
@@ -217,16 +223,16 @@ object App {
                 while (true) {
                     val msgs        = g.aggregateMessages[Float] (
                         triplet => {
-                            // var outlinks = params.neighbor_map_out(triplet.srcId)
-                            // triplet.sendToDst(triplet.srcAttr._3 / outlinks.length)
+                            var outlinks = params.neighbor_map_out(triplet.srcId)
+                            triplet.sendToDst(triplet.srcAttr._3 / outlinks.length)
 
-                            if (!params.restart && triplet.srcAttr._4 <= restartProb)
-                                params.restart = true
+                            // if (!params.restart && triplet.srcAttr._4 <= restartProb)
+                            //     params.restart = true
 
-                            if (triplet.dstAttr._5 < 3 || (!params.restart && triplet.srcAttr._2 <= dampingFactor)) {
-                                var outlinks = params.neighbor_map_out(triplet.srcId)
-                                triplet.sendToDst(triplet.srcAttr._3 / outlinks.length)
-                            }
+                            // if (triplet.dstAttr._5 < 3 || (!params.restart && triplet.srcAttr._2 <= dampingFactor)) {
+                            //     var outlinks = params.neighbor_map_out(triplet.srcId)
+                            //     triplet.sendToDst(triplet.srcAttr._3 / outlinks.length)
+                            // }
                         },
                         (a, b) => a + b
                     )

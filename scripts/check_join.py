@@ -1,13 +1,7 @@
-import sys
-
-sys.path.append("..")
-
 from pprint import pprint
 import numpy as np
 import pandas as pd
-from prototype.crawl_init_data.increase_id import cal_next_id
 
-# each JSON is small, there's no need in iterative processing
 import json
 import sys
 import os
@@ -23,20 +17,7 @@ from pyspark.sql.types import StructType, StructField, StringType, LongType, Int
 import copy
 import uuid
 
-os.environ["JAVA_HOME"] = "/opt/corretto-8"
-os.environ["HADOOP_CONF_DIR"] = "/recsys/prototype/spark_submit/hdfs_cfg"
-
-JAVA_LIB = "/opt/corretto-8/lib"
-
-spark = SparkSession.builder \
-    .config("spark.app.name", "Recsys") \
-    .config("spark.master", "local[*]") \
-    .config("spark.submit.deployMode", "client") \
-    .config("spark.yarn.appMasterEnv.SPARK_HOME", "/opt/spark") \
-    .config("spark.yarn.appMasterEnv.PYSPARK_PYTHON", "/virtual/python/bin/python") \
-    .config("spark.yarn.jars", "hdfs://128.0.5.3:9000/lib/java/spark/jars/*.jar") \
-    .config("spark.sql.legacy.allowNonEmptyLocationInCTAS", "true") \
-    .getOrCreate()
+spark = (pyspark.sql.SparkSession.builder.getOrCreate())
 
 userSchema = StructType([
     StructField("id", StringType(), False),
@@ -44,6 +25,7 @@ userSchema = StructType([
 ])
 user_data = [
     ("1", "alisa"),
+    ("1", "doom"),
     ("2", "grande"),
     ("3", "alex"),
     ("4", "john"),
@@ -58,6 +40,7 @@ userBuySchema = StructType([
 ])
 userBuy_data = [
     ("1", "2"),
+    ("1", "4"),
     ("3", "5"),
     ("6", "4")
 ]
@@ -66,10 +49,15 @@ userBuy_df.createOrReplaceTempView("userBuy")
 
 spark.sql("""
 select *
-from user as u left join userBuy as ub on u.id = ub.user_id
+from user as u left join userBuy as ub on ub.user_id = u.id 
 """).show()
 
 spark.sql("""
 select *
-from userBuy as ub left join user as u on u.id = ub.user_id
-""").show()
+from user as u left join userBuy as ub on u.id = ub.user_id
+""").toPandas().to_csv("./out1.csv", index=False)
+
+spark.sql("""
+select *
+from user as u inner join userBuy as ub on u.id = ub.user_id
+""").toPandas().to_csv("./out2.csv", index=False)
