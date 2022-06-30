@@ -71,7 +71,7 @@ author_unique_df.createOrReplaceTempView("author_unique_df")
 
 author_rwr_rank_df = spark.sql("""
     select aud.author_id, 
-        cast((CASE WHEN cvd.authorid IS NULL THEN 0.15 * (1 / 2646516) ELSE cvd.node._1 END) as float) as ranking,
+        cast((CASE WHEN cvd.authorid IS NULL THEN 0.15 * (1 / 3306895) ELSE cvd.node._1 END) as float) as ranking,
         (CASE WHEN cvd.authorid IS NULL THEN 0 ELSE 1 END) as computed
     from author_unique_df as aud
         left join (

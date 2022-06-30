@@ -33,6 +33,8 @@ ranking_schema = StructType([
 author_org_rank_df = spark.read.schema(ranking_schema).parquet(author_org_rank_dir)
 author_org_rank_df.createOrReplaceTempView("author_org_rank_df")
 
+author_org_rank_df.count()
+
 spark.sql("""
     select *
     from author_org_rank_df

@@ -1,0 +1,18 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, StringType, LongType, IntegerType, FloatType
+import pyspark.sql.functions as sparkf
+
+spark = SparkSession.builder.getOrCreate()
+
+sample_neg_dir = "s3://recsys-bucket/data_lake/arnet/tables/coauthor_negative_train/merge-0"
+
+sample_neg_schema = StructType([
+    StructField("author1", StringType(), False),
+    StructField("author2", StringType(), False),
+    StructField("label", IntegerType(), False),
+])
+
+sample_neg_df = spark.read.schema(sample_neg_schema).parquet(sample_neg_dir)
+
+sample_neg_df.count()
+sample_neg_df.filter((sparkf.col("label") == 0)).count()

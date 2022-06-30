@@ -19,27 +19,26 @@ import pyspark.sql.functions as sparkf
 import copy
 import uuid
 
-citation_dir        = "s3://recsys-bucket/data_lake/arnet/tables/citation_2/merge-0"
-dst_dir             = "s3://recsys-bucket/data_lake/arnet/tables/citation_vertex/merge-0"
+citation_dir            = "s3://recsys-bucket/data_lake/arnet/tables/citation_2/merge-0"
+published_history_dir   = "s3://recsys-bucket/data_lake/arnet/tables/published_history/merge-0"
+dst_dir                 = "s3://recsys-bucket/data_lake/arnet/tables/citation_vertex/merge-0"
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate()) 
 
-citation_schema = StructType([
-    StructField('_id', StringType(), False),
-    StructField('_status', IntegerType(), False),
-    StructField('_order', IntegerType(), False),
-    StructField('paper_id', StringType(), False),
-    StructField('paper_title', StringType(), False),
-    StructField('author1_id', StringType(), False),
-    StructField('author1_name', StringType(), False),
-    StructField('author1_org', StringType(), False),
-    StructField('author2_id', StringType(), False),
-    StructField('author2_name', StringType(), False),
-    StructField('author2_org', StringType(), False),
-    StructField('year', FloatType(), False),
+published_history_schema = StructType([
+    StructField("_id", StringType(), False),
+    StructField("_status", IntegerType(), False),
+    StructField("_order", IntegerType(), False),
+    StructField("author_id", StringType(), False),
+    StructField("author_name", StringType(), False),
+    StructField("author_org", StringType(), False),
+    StructField("paper_id", StringType(), False),
+    StructField("paper_title", StringType(), False),
+    StructField("year", FloatType(), False)
 ])
-citation_df = spark.read.schema(citation_schema).parquet(citation_dir).repartition(60)
-citation_df.createOrReplaceTempView("citation_df")
+
+published_history_df = spark.read.schema(published_history_schema).parquet(published_history_dir)
+published_history_df.createOrReplaceTempView("published_history_df")
 
 @sparkf.udf
 def gen_uuid():
@@ -55,11 +54,8 @@ new_df = spark.sql("""
         group_cid.author_id as author_id,
         cast(monotonically_increasing_id() as long) as row_order
     from (
-        (select author1_id as author_id
-        from citation_df)
-        union distinct
-        (select author2_id as author_id
-        from citation_df)
+        select distinct author_id
+        from published_history_df
     ) as group_cid
 """)
 

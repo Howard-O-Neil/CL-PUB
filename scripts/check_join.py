@@ -60,4 +60,5 @@ from user as u left join userBuy as ub on u.id = ub.user_id
 spark.sql("""
 select *
 from user as u inner join userBuy as ub on u.id = ub.user_id
-""").toPandas().to_csv("./out2.csv", index=False)
+""").show() 
+# .toPandas().to_csv("./out2.csv", index=False)

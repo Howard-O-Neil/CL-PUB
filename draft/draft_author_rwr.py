@@ -83,6 +83,17 @@ citation_rwr_bias_df.createOrReplaceTempView("citation_rwr_bias_df")
 published_history_df.createOrReplaceTempView("published_history_df")
 
 spark.sql("""
+    select *
+    from author_rwr_bias_df
+""").count()
+
+spark.sql("""
+    select *
+    from author_rwr_bias_df
+    where computed=0
+""").count()
+
+spark.sql("""
     select count(distinct author_id)
     from published_history_df
 """).show()
