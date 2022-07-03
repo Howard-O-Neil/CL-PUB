@@ -221,3 +221,6 @@ SCP-EMR:
 sv 	:= none
 EC2:
 	@ssh -i ~/Keys/Recsys-cluster.pem ec2-user@${sv}
+
+start-AWS-cli:
+	docker run --rm -it --entrypoint bash amazon/aws-cli:latest

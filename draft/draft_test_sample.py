@@ -17,7 +17,9 @@ def activity():
     sample_df = spark.read.schema(sample_schema).parquet(sample_dir)
     sample_df.createOrReplaceTempView("sample_df") \
 
-    print(sample_df.count())
+    print(f"Activity positive samples: {sample_df.filter((sparkf.col('label') == 1)).count()}")
+    print(f"Activity negative samples: {sample_df.filter((sparkf.col('label') == 0)).count()}")
+    print(f"Activity fullsize samples: {sample_df.count()}")
 
 def content():
     sample_dir = "s3://recsys-bucket/data_lake/arnet/tables/content_sample_test/merge-0" \
@@ -32,7 +34,9 @@ def content():
     sample_df = spark.read.schema(sample_schema).parquet(sample_dir)
     sample_df.createOrReplaceTempView("sample_df") \
 
-    print(sample_df.count())
+    print(f"Content positive samples: {sample_df.filter((sparkf.col('label') == 1)).count()}")
+    print(f"Content negative samples: {sample_df.filter((sparkf.col('label') == 0)).count()}")
+    print(f"Content fullsize samples: {sample_df.count()}")
 
 def org_discrete():
     sample_dir = "s3://recsys-bucket/data_lake/arnet/tables/org_discrete_sample_test/merge-0" \
@@ -47,7 +51,9 @@ def org_discrete():
     sample_df = spark.read.schema(sample_schema).parquet(sample_dir)
     sample_df.createOrReplaceTempView("sample_df") \
 
-    print(sample_df.count())
+    print(f"Org discrete positive samples: {sample_df.filter((sparkf.col('label') == 1)).count()}")
+    print(f"Org discrete negative samples: {sample_df.filter((sparkf.col('label') == 0)).count()}")
+    print(f"Org discrete fullsize samples: {sample_df.count()}")
 
 def org_rank():
     sample_dir = "s3://recsys-bucket/data_lake/arnet/tables/org_rank_sample_test/merge-0" \
@@ -62,7 +68,9 @@ def org_rank():
     sample_df = spark.read.schema(sample_schema).parquet(sample_dir)
     sample_df.createOrReplaceTempView("sample_df") \
 
-    print(sample_df.count())
+    print(f"Org rank positive samples: {sample_df.filter((sparkf.col('label') == 1)).count()}")
+    print(f"Org rank negative samples: {sample_df.filter((sparkf.col('label') == 0)).count()}")
+    print(f"Org rank fullsize samples: {sample_df.count()}")
 
 def rwr_bias():
     rwr_bias_dir = "s3://recsys-bucket/data_lake/arnet/tables/rwr_bias_sample_test/merge-0" \
@@ -77,7 +85,9 @@ def rwr_bias():
     sample_df = spark.read.schema(sample_schema).parquet(rwr_bias_dir)
     sample_df.createOrReplaceTempView("sample_df") \
 
-    print(sample_df.count())
+    print(f"RWR bias positive samples: {sample_df.filter((sparkf.col('label') == 1)).count()}")
+    print(f"RWR bias negative samples: {sample_df.filter((sparkf.col('label') == 0)).count()}")
+    print(f"RWR bias fullsize samples: {sample_df.count()}")
 
 org_discrete()
 org_rank()
