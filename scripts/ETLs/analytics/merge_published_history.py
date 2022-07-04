@@ -18,8 +18,8 @@ from pyspark.sql.types import StructType, StructField, StringType, LongType, Int
 import copy
 import uuid
 
-file_prefix = "s3://recsys-bucket/data_lake/arnet/tables/published_history/parts/"
-dst_dir     = "s3://recsys-bucket/data_lake/arnet/tables/published_history/merge-0"
+file_prefix = "s3://recsys-bucket-1/data_lake/arnet/tables/published_history/parts/"
+dst_dir     = "s3://recsys-bucket-1/data_lake/arnet/tables/published_history/merge-0"
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate())
 

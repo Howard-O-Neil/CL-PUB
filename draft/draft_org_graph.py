@@ -19,9 +19,9 @@ import pyspark.sql.functions as sparkf
 import copy
 import uuid
 
-org_vertex_dir  = "s3://recsys-bucket/data_lake/arnet/tables/org_vertex/merge-0"
-org_edge_dir    = "s3://recsys-bucket/data_lake/arnet/tables/org_edge/merge-0"
-org_group_dir   = "s3://recsys-bucket/data_lake/arnet/tables/org_group/merge-0"
+org_vertex_dir  = "s3://recsys-bucket-1/data_lake/arnet/tables/org_vertex/merge-0"
+org_edge_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/org_edge/merge-0"
+org_group_dir   = "s3://recsys-bucket-1/data_lake/arnet/tables/org_group/merge-0"
 
 org_vertex_df   = spark.read.parquet(org_vertex_dir)
 org_edge_df     = spark.read.parquet(org_edge_dir)

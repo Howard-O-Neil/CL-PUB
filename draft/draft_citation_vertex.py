@@ -19,7 +19,7 @@ import pyspark.sql.functions as sparkf
 import copy
 import uuid
 
-citation_vertex_dir     = "s3://recsys-bucket/data_lake/arnet/tables/citation_vertex/merge-0"
+citation_vertex_dir     = "s3://recsys-bucket-1/data_lake/arnet/tables/citation_vertex/merge-0"
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate()) 
 

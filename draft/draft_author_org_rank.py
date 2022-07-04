@@ -19,7 +19,7 @@ import pyspark.sql.functions as sparkf
 import copy
 import uuid
 
-author_org_rank_dir = "s3://recsys-bucket/data_lake/arnet/tables/author_org_rank/merge-0"
+author_org_rank_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/author_org_rank/merge-0"
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate())
 

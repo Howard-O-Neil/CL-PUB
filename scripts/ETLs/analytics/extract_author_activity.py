@@ -5,8 +5,8 @@ import math
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate())
 
-published_history_dir = "s3://recsys-bucket/data_lake/arnet/tables/published_history/merge-0"
-dst_dir               = "s3://recsys-bucket/data_lake/arnet/tables/author_activity/merge-0"
+published_history_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/published_history/merge-0"
+dst_dir               = "s3://recsys-bucket-1/data_lake/arnet/tables/author_activity/merge-0"
 
 published_history_schema = StructType([
     StructField("_id", StringType(), False),

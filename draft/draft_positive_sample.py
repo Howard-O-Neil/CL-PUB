@@ -5,7 +5,7 @@ import pyspark.sql.functions as sparkf
 spark = SparkSession.builder.getOrCreate()
 
 def count_train():
-    sample_pos_dir = "s3://recsys-bucket/data_lake/arnet/tables/coauthor_positive_train/merge-0" \
+    sample_pos_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/coauthor_positive_train/merge-0" \
 
     sample_pos_schema = StructType([ \
         StructField("author1", StringType(), False), \
@@ -19,7 +19,7 @@ def count_train():
     print(f"Train positives: {sample_pos_df.filter((sparkf.col('label') == 1)).count()}")
 
 def count_test():
-    sample_pos_dir = "s3://recsys-bucket/data_lake/arnet/tables/coauthor_positive_test/merge-0" \
+    sample_pos_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/coauthor_positive_test/merge-0" \
 
     sample_pos_schema = StructType([ \
         StructField("author1", StringType(), False), \

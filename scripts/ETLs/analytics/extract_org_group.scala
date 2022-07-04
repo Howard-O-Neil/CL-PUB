@@ -11,9 +11,9 @@ import org.apache.spark.TaskContext
 import scala.util.control._
 import scala.collection.mutable._
 
-val org_vertex_dir  = "s3://recsys-bucket/data_lake/arnet/tables/org_vertex/merge-0"
-val org_edge_dir    = "s3://recsys-bucket/data_lake/arnet/tables/org_edge/merge-0"
-val dst_dir         = "s3://recsys-bucket/data_lake/arnet/tables/org_group/merge-0"
+val org_vertex_dir  = "s3://recsys-bucket-1/data_lake/arnet/tables/org_vertex/merge-0"
+val org_edge_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/org_edge/merge-0"
+val dst_dir         = "s3://recsys-bucket-1/data_lake/arnet/tables/org_group/merge-0"
 
 var graph : Graph[Double, Double]   = null
 

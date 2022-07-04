@@ -19,9 +19,9 @@ import pyspark.sql.functions as sparkf
 import copy
 import uuid
 
-coauthor_dir            = "s3://recsys-bucket/data_lake/arnet/tables/coauthor/merge-0"
-org_vertex_dir          = "s3://recsys-bucket/data_lake/arnet/tables/org_vertex/merge-0"
-dst_dir                 = "s3://recsys-bucket/data_lake/arnet/tables/org_edge/merge-0"
+coauthor_dir            = "s3://recsys-bucket-1/data_lake/arnet/tables/coauthor/merge-0"
+org_vertex_dir          = "s3://recsys-bucket-1/data_lake/arnet/tables/org_vertex/merge-0"
+dst_dir                 = "s3://recsys-bucket-1/data_lake/arnet/tables/org_edge/merge-0"
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate())
 

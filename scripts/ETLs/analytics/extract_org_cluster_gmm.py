@@ -23,8 +23,8 @@ from pyspark.ml.clustering import KMeans, GaussianMixture
 from pyspark.ml.linalg import DenseVector
 from pyspark.ml.evaluation import ClusteringEvaluator
 
-org_rank_dir            = "s3://recsys-bucket/data_lake/arnet/tables/org_rank_algo/iter-14"
-dst_dir                 = "s3://recsys-bucket/data_lake/arnet/tables/org_cluster/merge-0"
+org_rank_dir            = "s3://recsys-bucket-1/data_lake/arnet/tables/org_rank_algo/iter-14"
+dst_dir                 = "s3://recsys-bucket-1/data_lake/arnet/tables/org_cluster/merge-0"
 
 spark                   = (pyspark.sql.SparkSession.builder.getOrCreate())
 

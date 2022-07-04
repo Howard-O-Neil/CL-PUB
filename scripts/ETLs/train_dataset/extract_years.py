@@ -1,7 +1,7 @@
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, FloatType
 from pyspark.sql import SparkSession
 
-published_history_dir = "s3://recsys-bucket/data_lake/arnet/tables/published_history/merge-0"
+published_history_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/published_history/merge-0"
 
 spark = SparkSession.builder.getOrCreate()
 

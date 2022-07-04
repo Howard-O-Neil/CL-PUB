@@ -22,7 +22,7 @@ import uuid
 count_parquet       = 0
 # source              = "/home/hadoop/virtual/data/dataset/arnet/citation/dblpv13.json"
 source_prefix       = "/home/hadoop/spark/arnet/tables/coauthor/parts/"
-coauthor_dir        = "s3://recsys-bucket/data_lake/arnet/tables/coauthor/merge-0"
+coauthor_dir        = "s3://recsys-bucket-1/data_lake/arnet/tables/coauthor/merge-0"
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate())
 

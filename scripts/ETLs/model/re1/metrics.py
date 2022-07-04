@@ -12,9 +12,9 @@ from pyspark.context import SparkContext
 from pyspark.sql.types import StructType, StructField, StringType, LongType, IntegerType, FloatType, ArrayType
 import pyspark.sql.functions as sparkf
 
-content_train_dir   = "s3://recsys-bucket/data_lake/arnet/tables/content_sample_train/merge-0"
-content_test_dir    = "s3://recsys-bucket/data_lake/arnet/tables/content_sample_test/merge-0"
-coauthor_dir        = "s3://recsys-bucket/data_lake/arnet/tables/coauthor/merge-0"
+content_train_dir   = "s3://recsys-bucket-1/data_lake/arnet/tables/content_sample_train/merge-0"
+content_test_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/content_sample_test/merge-0"
+coauthor_dir        = "s3://recsys-bucket-1/data_lake/arnet/tables/coauthor/merge-0"
 
 train_hdfs_dir = "hdfs:///temp/recsys/train/re1"
 test_hdfs_dir = "hdfs:///temp/recsys/test/re1"
@@ -101,7 +101,7 @@ model.load_weights("/home/hadoop/model/re1/model.h5")
 print("\n\n===== EVALUTING MODEL... =====\n\n")
 
 def cal_test_df():
-    coauthor_dir    = "s3://recsys-bucket/data_lake/arnet/tables/coauthor/merge-0"
+    coauthor_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/coauthor/merge-0"
 
     coauthor_schema = StructType([
         StructField('_id', StringType(), False),

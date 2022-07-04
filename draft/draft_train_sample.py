@@ -5,7 +5,7 @@ import pyspark.sql.functions as sparkf
 spark = SparkSession.builder.getOrCreate()
 
 def activity():
-    sample_dir = "s3://recsys-bucket/data_lake/arnet/tables/activity_sample_train/merge-0" \
+    sample_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/activity_sample_train/merge-0" \
 
     sample_schema = StructType([
         StructField("author1", StringType(), False),
@@ -22,7 +22,7 @@ def activity():
     print(f"Activity fullsize samples: {sample_df.count()}")
 
 def content():
-    sample_dir = "s3://recsys-bucket/data_lake/arnet/tables/content_sample_train/merge-0" \
+    sample_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/content_sample_train/merge-0" \
 
     sample_schema = StructType([
         StructField("author1", StringType(), False),
@@ -39,7 +39,7 @@ def content():
     print(f"Content fullsize samples: {sample_df.count()}")
 
 def org_discrete():
-    sample_dir = "s3://recsys-bucket/data_lake/arnet/tables/org_discrete_sample_train/merge-0" \
+    sample_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/org_discrete_sample_train/merge-0" \
 
     sample_schema = StructType([
         StructField("author1", StringType(), False),
@@ -56,7 +56,7 @@ def org_discrete():
     print(f"Org discrete fullsize samples: {sample_df.count()}")
 
 def org_rank():
-    sample_dir = "s3://recsys-bucket/data_lake/arnet/tables/org_rank_sample_train/merge-0" \
+    sample_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/org_rank_sample_train/merge-0" \
 
     sample_schema = StructType([
         StructField("author1", StringType(), False),
@@ -73,7 +73,7 @@ def org_rank():
     print(f"Org rank fullsize samples: {sample_df.count()}")
 
 def rwr_bias():
-    rwr_bias_dir = "s3://recsys-bucket/data_lake/arnet/tables/rwr_bias_sample_train/merge-0" \
+    rwr_bias_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/rwr_bias_sample_train/merge-0" \
 
     sample_schema = StructType([
         StructField("author1", StringType(), False),

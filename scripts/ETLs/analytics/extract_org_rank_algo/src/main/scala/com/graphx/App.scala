@@ -12,10 +12,10 @@ import org.apache.spark.sql.{types => sparkSQL_T}
 import org.apache.spark.storage._
 
 object App {
-    val org_vertex_dir          = "s3://recsys-bucket/data_lake/arnet/tables/org_vertex/merge-0"
-    val org_edge_dir            = "s3://recsys-bucket/data_lake/arnet/tables/org_edge/merge-0"
-    val org_group_dir           = "s3://recsys-bucket/data_lake/arnet/tables/org_group/merge-0"
-    val dst_dir                 = "s3://recsys-bucket/data_lake/arnet/tables/org_rank_algo/iter-"
+    val org_vertex_dir          = "s3://recsys-bucket-1/data_lake/arnet/tables/org_vertex/merge-0"
+    val org_edge_dir            = "s3://recsys-bucket-1/data_lake/arnet/tables/org_edge/merge-0"
+    val org_group_dir           = "s3://recsys-bucket-1/data_lake/arnet/tables/org_group/merge-0"
+    val dst_dir                 = "s3://recsys-bucket-1/data_lake/arnet/tables/org_rank_algo/iter-"
 
     def main(args: Array[String]) = {
         var spark: SparkSession     = (SparkSession.builder.getOrCreate())

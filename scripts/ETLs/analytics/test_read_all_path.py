@@ -19,7 +19,7 @@ import pyspark.sql.functions as sparkf
 import copy
 import uuid
 
-all_path_dir = "s3://recsys-bucket/data_lake/arnet/tables/test_all_path/merge-0"
+all_path_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/test_all_path/merge-0"
 
 spark = (pyspark.SparkSession.builder.getOrCreate())
 

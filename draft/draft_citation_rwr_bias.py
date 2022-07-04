@@ -19,7 +19,7 @@ import pyspark.sql.functions as sparkf
 import copy
 import uuid
 
-citation_rwr_dir    = "s3://recsys-bucket/data_lake/arnet/tables/citation_rwr_bias/iter-"
+citation_rwr_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/citation_rwr_bias/iter-"
 
 test_df1 = spark.read.parquet(citation_rwr_dir + "1")
 test_df2 = spark.read.parquet(citation_rwr_dir + "2")

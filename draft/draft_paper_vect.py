@@ -19,7 +19,7 @@ import pyspark.sql.functions as sparkf
 import copy
 import uuid
 
-paper_vect_dir    = "s3://recsys-bucket/data_lake/arnet/tables/paper_vect/repartition-Hash-1000"
+paper_vect_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/paper_vect/repartition-Hash-1000"
 
 paper_vect_schema = StructType([
     StructField('id', StringType(), False),

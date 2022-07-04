@@ -12,7 +12,7 @@ from pyspark.context import SparkContext
 from pyspark.sql.types import StructType, StructField, StringType, LongType, IntegerType, FloatType, ArrayType
 import pyspark.sql.functions as sparkf
 
-coauthor_dir        = "s3://recsys-bucket/data_lake/arnet/tables/coauthor/merge-0"
+coauthor_dir        = "s3://recsys-bucket-1/data_lake/arnet/tables/coauthor/merge-0"
 test_hdfs_dir       = "hdfs:///temp/recsys/test/re5"
 
 spark_conf = SparkConf()
@@ -97,7 +97,7 @@ model.load_weights("/home/hadoop/model/re7/model.h5")
 print("\n\n===== EVALUTING MODEL... =====\n\n")
 
 def cal_test_df():
-    coauthor_dir    = "s3://recsys-bucket/data_lake/arnet/tables/coauthor/merge-0"
+    coauthor_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/coauthor/merge-0"
 
     coauthor_schema = StructType([
         StructField('_id', StringType(), False),

@@ -12,9 +12,9 @@ import org.apache.spark.sql.{types => sparkSQL_T}
 import org.apache.spark.storage._
 
 object App {
-    val citation_vertex_dir     = "s3://recsys-bucket/data_lake/arnet/tables/citation_vertex/merge-0"
-    val citation_edge_dir       = "s3://recsys-bucket/data_lake/arnet/tables/citation_edge/merge-0"
-    val dst_dir                 = "s3://recsys-bucket/data_lake/arnet/tables/citation_rwr/iter-"
+    val citation_vertex_dir     = "s3://recsys-bucket-1/data_lake/arnet/tables/citation_vertex/merge-0"
+    val citation_edge_dir       = "s3://recsys-bucket-1/data_lake/arnet/tables/citation_edge/merge-0"
+    val dst_dir                 = "s3://recsys-bucket-1/data_lake/arnet/tables/citation_rwr/iter-"
 
     def main(args: Array[String]) = {
         var spark: SparkSession     = (SparkSession.builder.getOrCreate())

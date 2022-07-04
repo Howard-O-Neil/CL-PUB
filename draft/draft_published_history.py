@@ -19,7 +19,7 @@ from pyspark.sql.types import StructType, StructField, StringType, LongType, Int
 import copy
 import uuid
 
-published_history_dir = "s3://recsys-bucket/data_lake/arnet/tables/published_history/merge-0"
+published_history_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/published_history/merge-0"
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate())
 
@@ -37,6 +37,13 @@ deptSchema = StructType([
 
 deptDf = spark.read.schema(deptSchema).parquet(published_history_dir)
 deptDf.createOrReplaceTempView("published_history")
+
+deptDf.write.mode("overwrite").parquet("s3://recsys-bucket-1/data_lake/arnet/tables/published_history/backup-0")
+
+spark.sql("""
+    select *
+    from published_history
+""").show(vertical=True)
 
 spark.sql("""
     select count(distinct author_id)

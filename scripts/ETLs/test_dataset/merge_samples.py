@@ -4,9 +4,9 @@ import pyspark.sql.functions as sparkf
 
 spark = SparkSession.builder.getOrCreate()
 
-positive_dir    = "s3://recsys-bucket/data_lake/arnet/tables/coauthor_positive_test/merge-0"
-negative_dir    = "s3://recsys-bucket/data_lake/arnet/tables/coauthor_negative_test/merge-0"
-dst_dir         = "s3://recsys-bucket/data_lake/arnet/tables/test_samples/merge-0"
+positive_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/coauthor_positive_test/merge-0"
+negative_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/coauthor_negative_test/merge-0"
+dst_dir         = "s3://recsys-bucket-1/data_lake/arnet/tables/test_samples/merge-0"
 
 sample_schema = StructType([
     StructField("author1", StringType(), False),

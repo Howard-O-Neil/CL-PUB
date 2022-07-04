@@ -11,8 +11,8 @@ import org.apache.spark.{sql => sparkSQL}
 import org.apache.spark.sql.{types => sparkSQL_T}
 
 
-org_vertex_dir  = "s3://recsys-bucket/data_lake/arnet/tables/org_vertex/merge-0"
-org_edge_dir    = "s3://recsys-bucket/data_lake/arnet/tables/org_edge/merge-0"
+org_vertex_dir  = "s3://recsys-bucket-1/data_lake/arnet/tables/org_vertex/merge-0"
+org_edge_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/org_edge/merge-0"
 
 spark.read.parquet(org_vertex_dir).createOrReplaceTempView("temp")
 spark.sql("""

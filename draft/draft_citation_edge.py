@@ -19,7 +19,7 @@ import pyspark.sql.functions as sparkf
 import copy
 import uuid
 
-citation_edge_dir   = "s3://recsys-bucket/data_lake/arnet/tables/citation_edge/merge-0"
+citation_edge_dir   = "s3://recsys-bucket-1/data_lake/arnet/tables/citation_edge/merge-0"
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate()) 
 

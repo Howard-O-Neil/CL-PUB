@@ -21,9 +21,9 @@ import uuid
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate())
 
-published_history_dir   = "s3://recsys-bucket/data_lake/arnet/tables/published_history/merge-0"
+published_history_dir   = "s3://recsys-bucket-1/data_lake/arnet/tables/published_history/merge-0"
 # append H size to the end
-dst_dir                 = "s3://recsys-bucket/data_lake/arnet/tables/paper_vect/merge-"
+dst_dir                 = "s3://recsys-bucket-1/data_lake/arnet/tables/paper_vect/merge-"
 
 optimized_partition = 50000
 
@@ -138,7 +138,7 @@ pooling_data = spark.createDataFrame(
     featurizedData.rdd.repartition(optimized_partition).mapPartitions(avg_pooling_1D), pooling_schema)
 pooling_data.write.mode("overwrite").parquet(dst_dir + "Hash-5000")
 
-repartition_dir = "s3://recsys-bucket/data_lake/arnet/tables/paper_vect/repartition-"
+repartition_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/paper_vect/repartition-"
 repartition_pooling = spark.read.schema(pooling_schema).parquet(dst_dir + "Hash-5000")
 repartition_pooling.repartition(120).write.parquet(repartition_dir + "Hash-5000")
 
