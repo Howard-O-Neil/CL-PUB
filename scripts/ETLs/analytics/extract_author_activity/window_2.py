@@ -1,3 +1,4 @@
+import pyspark
 from pyspark.sql.types import StringType, IntegerType, FloatType, StructType, StructField
 from pyspark.sql import SparkSession
 import pyspark.sql.functions as sparkf
@@ -6,7 +7,7 @@ import math
 spark = (pyspark.sql.SparkSession.builder.getOrCreate())
 
 published_history_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/published_history/merge-0"
-dst_dir               = "s3://recsys-bucket-1/data_lake/arnet/tables/author_activity/merge-0"
+dst_dir               = "s3://recsys-bucket-1/data_lake/arnet/tables/author_activity/merge-"
 
 published_history_schema = StructType([
     StructField("_id", StringType(), False),
@@ -67,4 +68,4 @@ filtered_df_read = spark.read.schema(published_history_schema).parquet("hdfs:///
 author_freq_df = filtered_df_read.groupBy(sparkf.col("author_id")).applyInPandas(
                     cal_activity_frequency, schema="author_id string, freq float")
 
-author_freq_df.write.mode("overwrite").parquet(dst_dir)
+author_freq_df.write.mode("overwrite").parquet(dst_dir + "Wnd-2")

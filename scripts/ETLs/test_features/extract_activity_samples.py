@@ -5,7 +5,7 @@ import pyspark.sql.functions as sparkf
 spark = SparkSession.builder.getOrCreate()
 
 sample_dir          = "s3://recsys-bucket-1/data_lake/arnet/tables/test_samples/merge-0"
-author_activ_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/author_activity/merge-0"
+author_activ_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/author_activity/merge-Wnd-2"
 dst_dir             = "s3://recsys-bucket-1/data_lake/arnet/tables/activity_sample_test/merge-0"
 
 optimized_partition_num = 2500
