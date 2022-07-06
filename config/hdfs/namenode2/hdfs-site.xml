@@ -27,11 +27,11 @@
     </property>
     <property>
         <name>dfs.namenode.checkpoint.dir</name>
-        <value>file:///home/hadoop/hdfs/cp_nn1,file:///home/hadoop/hdfs/cp_nn2</value>
+        <value>file:///home/hadoop/hdfs/cp_nn1</value>
     </property>
     <property>
         <name>dfs.namenode.checkpoint.edits.dir</name>
-        <value>file:///home/hadoop/hdfs/cp_edits1,file:///home/hadoop/hdfs/cp_edits2</value>
+        <value>file:///home/hadoop/hdfs/cp_edits1</value>
     </property>
     <property>
         <name>dfs.namenode.checkpoint.period</name>

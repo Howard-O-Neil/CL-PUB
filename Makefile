@@ -28,6 +28,13 @@ update-container:
 up-gpu:
 	@echo "Docker-compose up GPU cluster..."
 	@docker-compose -f *gpu.yaml up
+start-tensor:
+	@echo "Starting tensor container..."
+	@docker-compose -f *gpu.yaml up -d recsys-server1
+
+attach-tensor:
+	@echo "Starting tensor container..."
+	@docker exec -u hadoop -it recsys-server1 bash
 
 start_dfs := ssh hadoop@recsys-namenode1 $$(echo '"') \
 	bash -c $$(echo '\"') $$(cat hadoop.env | tr '\n' ' ') /opt/hadoop-3/sbin/start-dfs.sh $$(echo '\"') \
@@ -155,12 +162,8 @@ down-hdfs:
 
 	@echo "[Backup images checkpoint1...]"
 	eval $(mv_cp_nn1)
-	@echo "[Backup images checkpoint2...]"
-	eval $(mv_cp_nn2)
 	@echo "[Backup edits checkpoint1...]"
 	eval $(mv_cp_edits1)
-	@echo "[Backup edits checkpoint2...]"
-	eval $(mv_cp_edits2)
 
 	@echo "[Stopping hdfs...]"
 	eval $(stop_dfs)
@@ -205,3 +208,19 @@ up-dns:
 down-dns:
 	@echo "Up DNS router..."
 	@docker-compose -f *dns.yaml down
+
+sv := none
+EMR:
+	@ssh -i ~/Keys/Recsys-cluster.pem hadoop@${sv}
+
+sv 	:= none
+f 	:= none
+SCP-EMR:
+	@scp -i ~/Keys/Recsys-cluster.pem ${f} hadoop@${sv}
+
+sv 	:= none
+EC2:
+	@ssh -i ~/Keys/Recsys-cluster.pem ec2-user@${sv}
+
+start-AWS-cli:
+	docker run --rm -it --entrypoint bash amazon/aws-cli:latest

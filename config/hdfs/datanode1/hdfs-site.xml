@@ -19,7 +19,7 @@
 <configuration>
     <property>
         <name>dfs.datanode.data.dir</name>
-        <value>file:///home/hadoop/hdfs/dn1,file:///home/hadoop/hdfs/dn2</value>
+        <value>file:///home/hadoop/hdfs/dn1</value>
     </property>
     <property>
         <name>dfs.disk.balancer.enabled</name>

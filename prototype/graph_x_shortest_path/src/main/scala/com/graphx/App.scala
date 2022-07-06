@@ -26,7 +26,11 @@ object App {
                                 (3L, ("C", 0D)), (4L, ("D", 0D)),
                                 (5L, ("E", 0D)), (6L, ("F", 0D)),
                                 (7L, ("G", 0D)), (8L, ("H", 0D)),
-                                (9L, ("I", 0D))))
+                                (9L, ("I", 0D)),
+                                (10L, ("K", 0D)),
+                                (11L, ("U", 0D)),
+                                (12L, ("O", 0D)),
+                                (13L, ("Z", 0D))))
 
         // Create an RDD for edges
         val relationships: RDD[Edge[Double]] = 
@@ -51,7 +55,15 @@ object App {
                 // GH
                 Edge(7L, 8L, 3D), Edge(8L, 7L, 3D),
                 // DI
-                Edge(4L, 9L, 6D), Edge(9L, 4L, 6D)))
+                Edge(4L, 9L, 6D), Edge(9L, 4L, 6D),
+                // KU, KO, KZ
+                Edge(10L, 11L, 9D), Edge(11L, 10L, 9D),
+                Edge(10L, 12L, 8D), Edge(12L, 10L, 8D),
+                Edge(10L, 13L, 3D), Edge(13L, 10L, 3D),
+                // ZU
+                Edge(13L, 11L, 5D), Edge(11L, 13L, 5D),
+                // OU
+                Edge(12L, 11L, 6D), Edge(11L, 12L, 6D)))
 
         val graph = Graph(users, relationships)
 
