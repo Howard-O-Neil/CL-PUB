@@ -12,12 +12,8 @@ from pyspark.context import SparkContext
 from pyspark.sql.types import StructType, StructField, StringType, LongType, IntegerType, FloatType, ArrayType
 import pyspark.sql.functions as sparkf
 
-content_train_dir   = "s3://recsys-bucket-1/data_lake/arnet/tables/content_sample_train/merge-0"
-content_test_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/content_sample_test/merge-0"
 coauthor_dir        = "s3://recsys-bucket-1/data_lake/arnet/tables/coauthor/merge-0"
-
-train_hdfs_dir = "hdfs:///temp/recsys/train/re1"
-test_hdfs_dir = "hdfs:///temp/recsys/test/re1"
+testing_dir         = "s3://recsys-bucket-1/data_lake/arnet/tables/testing/merge-0"
 
 spark_conf = SparkConf()
 
@@ -44,7 +40,7 @@ def model_creator(config):
     x_inputs = tf.keras.Input(shape=(1,))
 
     initializer = tf.keras.initializers.HeNormal()
-    regularizer = tf.keras.regularizers.L2(0.0001)
+    regularizer = tf.keras.regularizers.L2(0.00005)
 
     linear1 = tf.keras.layers.Dense(units=32, \
         activation='relu', \
@@ -89,7 +85,7 @@ def model_creator(config):
     ml_outputs = SVM_layer(linear2(linear1(x_inputs)))
     model = tf.keras.Model(inputs=x_inputs, outputs=ml_outputs)
 
-    optim = tf.keras.optimizers.Adam(learning_rate=0.001)
+    optim = tf.keras.optimizers.Adam(learning_rate=0.0001)
     model.compile(optimizer=optim, loss=SVM_linear_loss, metrics=[SVM_binary_metric])
 
     return model
@@ -129,7 +125,7 @@ def cal_test_df():
     """)
     coauthor_output_df.createOrReplaceTempView("coauthor_output_df")
 
-    spark.read.parquet(test_hdfs_dir).createOrReplaceTempView("test_view")
+    spark.read.parquet(testing_dir).createOrReplaceTempView("test_view")
 
     return spark.sql("""
         select tv.cos_dist as f1, cast(tv.label as int) as label,
@@ -199,7 +195,7 @@ def cal_collab_quality_k(k=1):
 
 import pandas
 data = [
-    ["BINARY ACCURACY", cal_binary_acc()],
+    ["BINARY_ACCURACY", cal_binary_acc()],
     ["PRECESION", cal_precision()],
     ["RECALL", cal_recall()],
     ["AUC", cal_AUC()],
@@ -210,4 +206,8 @@ data = [
     ["CQ@100", cal_collab_quality_k(100)],
 ]
 
-pandas.DataFrame(data)
+df = pandas.DataFrame(data)
+
+print(df.to_string())
+
+df.to_csv("/home/hadoop/model/re1/eval.csv")

@@ -12,11 +12,7 @@ from pyspark.context import SparkContext
 from pyspark.sql.types import StructType, StructField, StringType, LongType, IntegerType, FloatType, ArrayType
 import pyspark.sql.functions as sparkf
 
-content_train_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/content_sample_train/merge-0"
-content_test_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/content_sample_test/merge-0"
-
-train_hdfs_dir = "hdfs:///temp/recsys/train/re1"
-test_hdfs_dir = "hdfs:///temp/recsys/test/re1"
+training_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/training/merge-0"
 
 spark_conf = SparkConf()
 
@@ -27,22 +23,20 @@ for conf in conf_lines:
     conf_set = conf.strip().split(";")
     spark_conf.set(conf_set[0], conf_set[1])
 
-# .config("spark.scheduler.maxRegisteredResourcesWaitingTime", "3600s") \
-# .config("spark.scheduler.minRegisteredResourcesRatio", "1.0") \
 spark = SparkSession.builder \
             .appName("AI model") \
             .config(conf=spark_conf) \
-            .config("spark.executor.memory", "5g") \
+            .config("spark.executor.memory", "10g") \
             .getOrCreate()
 
 import torch
 import tensorflow as tf
 import numpy as np
 
-spark.read.parquet(train_hdfs_dir).createOrReplaceTempView("train_view")
+spark.read.parquet(training_dir).createOrReplaceTempView("train_view")
 
 train_samples_bigdl = spark.sql("""
-    select tv.cos_dist as feature,
+    select tv.cos_dist as f1, 
         cast((CASE WHEN tv.label = 0 THEN -1 ELSE 1 END) as int) as label
     from train_view as tv
 """)
@@ -54,12 +48,15 @@ spark.stop()
 feature_np = train_samples_np[:, 0:1]
 label_np = train_samples_np[:, 1:2]
 
-SVM_threshold = 0.2
+global_seed = 5499
+tf.random.set_seed(global_seed)
+
+SVM_threshold = 0.0
 
 def model_creator(config):
     x_inputs = tf.keras.Input(shape=(1,))
 
-    initializer = tf.keras.initializers.HeNormal()
+    initializer = tf.keras.initializers.HeNormal(seed=global_seed)
     regularizer = tf.keras.regularizers.L2(0.00005)
 
     linear1 = tf.keras.layers.Dense(units=32, \
@@ -122,4 +119,3 @@ history = model.fit(feature_np, label_np, batch_size=batch_size, epochs=25, shuf
 model.save_weights("/home/hadoop/model/re1/model.h5")
 
 print("\n\n ===== DONED ===== \n\n")
-

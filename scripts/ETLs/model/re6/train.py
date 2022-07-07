@@ -12,7 +12,7 @@ from pyspark.context import SparkContext
 from pyspark.sql.types import StructType, StructField, StringType, LongType, IntegerType, FloatType, ArrayType
 import pyspark.sql.functions as sparkf
 
-train_hdfs_dir = "hdfs:///temp/recsys/train/re5"
+training_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/training/merge-0"
 
 spark_conf = SparkConf()
 
@@ -28,14 +28,14 @@ for conf in conf_lines:
 spark = SparkSession.builder \
             .appName("AI model") \
             .config(conf=spark_conf) \
-            .config("spark.executor.memory", "5g") \
+            .config("spark.executor.memory", "10g") \
             .getOrCreate()
 
 import torch
 import tensorflow as tf
 import numpy as np
 
-spark.read.parquet(train_hdfs_dir).createOrReplaceTempView("train_view")
+spark.read.parquet(training_dir).createOrReplaceTempView("train_view")
 
 train_samples_bigdl = spark.sql("""
     select tv.cos_dist as f1, tv.org_rank_proximity as f2, tv.rwr_bias_proximity as f3, tv.freq_proximity as f4,
@@ -50,12 +50,15 @@ spark.stop()
 feature_np = train_samples_np[:, 0:4]
 label_np = train_samples_np[:, 4:5]
 
-SVM_threshold = 0.2
+global_seed = 5499
+tf.random.set_seed(global_seed)
+
+SVM_threshold = 0.0
 
 def model_creator(config):
     x_inputs = tf.keras.Input(shape=(4,))
 
-    initializer = tf.keras.initializers.HeNormal()
+    initializer = tf.keras.initializers.HeNormal(seed=global_seed)
     regularizer = tf.keras.regularizers.L2(0.00005)
 
     linear1 = tf.keras.layers.Dense(units=64, \
@@ -118,4 +121,3 @@ history = model.fit(feature_np, label_np, batch_size=batch_size, epochs=25, shuf
 model.save_weights("/home/hadoop/model/re6/model.h5")
 
 print("\n\n ===== DONED ===== \n\n")
-
