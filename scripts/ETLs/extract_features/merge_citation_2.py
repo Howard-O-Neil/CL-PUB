@@ -19,9 +19,9 @@ import pyspark.sql.functions as sparkf
 import copy
 import uuid
 
-published_history_dir   = "s3://recsys-bucket-1/data_lake/arnet/tables/published_history/merge-0"
-citation_dir            = "s3://recsys-bucket-1/data_lake/arnet/tables/citation/merge-0"
-dst_dir                 = "s3://recsys-bucket-1/data_lake/arnet/tables/citation_2/merge-0"
+published_history_dir   = "gs://clpub/data_lake/arnet/tables/published_history/merge-0"
+citation_dir            = "gs://clpub/data_lake/arnet/tables/citation/merge-0"
+dst_dir                 = "gs://clpub/data_lake/arnet/tables/citation_2/merge-0"
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate())
 
@@ -81,4 +81,4 @@ new_df = spark.sql("""
 """)
 
 # 4*3 = 12 core cluster, 12*5 partition
-new_df.repartition(60).write.mode("overwrite").format("parquet").save(dst_dir)
+new_df.write.mode("overwrite").format("parquet").save(dst_dir)

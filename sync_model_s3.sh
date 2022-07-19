@@ -1,5 +1,5 @@
 # Sync from local
-aws s3 cp model/ s3://recsys-bucket-1/model/ --recursive
+aws s3 cp model/ gs://clpub/model/ --recursive
 
 # Download from s3
-aws s3 cp s3://recsys-bucket-1/model/ model/ --recursive
+aws s3 cp gs://clpub/model/ model/ --recursive

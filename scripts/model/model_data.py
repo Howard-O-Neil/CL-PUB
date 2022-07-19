@@ -4,23 +4,23 @@ from pyspark.context import SparkContext
 from pyspark.sql.types import StructType, StructField, StringType, LongType, IntegerType, FloatType, ArrayType
 import pyspark.sql.functions as sparkf
 
-content_train_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/content_sample_train/merge-0"
-content_test_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/content_sample_test/merge-0"
+content_train_dir = "gs://clpub/data_lake/arnet/tables/content_sample_train/merge-0"
+content_test_dir = "gs://clpub/data_lake/arnet/tables/content_sample_test/merge-0"
 
-orgrank_train_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/org_rank_sample_train/merge-0"
-orgrank_test_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/org_rank_sample_test/merge-0"
+orgrank_train_dir = "gs://clpub/data_lake/arnet/tables/org_rank_sample_train/merge-0"
+orgrank_test_dir = "gs://clpub/data_lake/arnet/tables/org_rank_sample_test/merge-0"
 
-orgdiscrete_train_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/org_discrete_sample_train/merge-0"
-orgdiscrete_test_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/org_discrete_sample_test/merge-0"
+orgdiscrete_train_dir = "gs://clpub/data_lake/arnet/tables/org_discrete_sample_train/merge-0"
+orgdiscrete_test_dir = "gs://clpub/data_lake/arnet/tables/org_discrete_sample_test/merge-0"
 
-rwr_bias_train_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/rwr_bias_sample_train/merge-0"
-rwr_bias_test_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/rwr_bias_sample_test/merge-0"
+rwr_bias_train_dir = "gs://clpub/data_lake/arnet/tables/rwr_bias_sample_train/merge-0"
+rwr_bias_test_dir = "gs://clpub/data_lake/arnet/tables/rwr_bias_sample_test/merge-0"
 
-freq_train_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/activity_sample_train/merge-0"
-freq_test_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/activity_sample_test/merge-0"
+freq_train_dir = "gs://clpub/data_lake/arnet/tables/activity_sample_train/merge-0"
+freq_test_dir = "gs://clpub/data_lake/arnet/tables/activity_sample_test/merge-0"
 
-train_dst_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/training/merge-0"
-test_dst_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/testing/merge-0"
+train_dst_dir = "gs://clpub/data_lake/arnet/tables/training/merge-0"
+test_dst_dir = "gs://clpub/data_lake/arnet/tables/testing/merge-0"
 
 spark = SparkSession.builder.getOrCreate()
 

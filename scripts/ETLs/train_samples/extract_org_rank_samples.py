@@ -4,11 +4,11 @@ import pyspark.sql.functions as sparkf
 
 spark = SparkSession.builder.getOrCreate()
 
-sample_dir      = "s3://recsys-bucket-1/data_lake/arnet/tables/train_samples/merge-0"
-org_rank_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/author_org_rank/merge-0"
-dst_dir         = "s3://recsys-bucket-1/data_lake/arnet/tables/org_rank_sample_train/merge-0"
+sample_dir      = "gs://clpub/data_lake/arnet/tables/train_samples/merge-0"
+org_rank_dir    = "gs://clpub/data_lake/arnet/tables/author_org_rank/merge-0"
+dst_dir         = "gs://clpub/data_lake/arnet/tables/org_rank_sample_train/merge-0"
 
-optimized_partition_num = 2000
+optimized_partition_num = 200
 
 sample_schema = StructType([
     StructField("author1", StringType(), False),
@@ -18,21 +18,19 @@ sample_schema = StructType([
 
 org_rank_schema = StructType([
     StructField("author_id", StringType(), False),
-    StructField("author_org", StringType(), False),
     StructField("org_rank", FloatType(), False),
-    StructField("computed", IntegerType(), False),
 ])
 
 # ===== Init DAG =====
 
-sample_df       = spark.read.schema(sample_schema).parquet(sample_dir).repartition(100)
+sample_df       = spark.read.schema(sample_schema).parquet(sample_dir).repartition(optimized_partition_num)
 org_rank_df     = spark.read.schema(org_rank_schema).parquet(org_rank_dir)
 
 sample_df.createOrReplaceTempView("sample_df")
 org_rank_df.createOrReplaceTempView("org_rank_df")
 
 ranking_samples_writer = spark.sql("""
-    select sd.author1, sd.author2, ord1.author_org as org1, ord2.author_org as org2,
+    select sd.author1, sd.author2,
         ord1.org_rank as author1_org_rank, ord2.org_rank as author2_org_rank, 
         sd.label
     from sample_df as sd
@@ -67,15 +65,13 @@ def node_proximity(v1, v2):
 org_rank_sample_schema = StructType([
     StructField("author1", StringType(), False),
     StructField("author2", StringType(), False),
-    StructField("org1", StringType(), False),
-    StructField("org2", StringType(), False),
     StructField("author1_org_rank", FloatType(), False),
     StructField("author2_org_rank", FloatType(), False),
     StructField("label", IntegerType(), False),
 ])
 ranking_samples = spark.read.schema(org_rank_sample_schema).parquet("hdfs:///temp/recsys/org_rank_train")
 org_rank_samples = ranking_samples.select( \
-    sparkf.col("author1"), sparkf.col("author2"), sparkf.col("org1"), sparkf.col("org2"), \
+    sparkf.col("author1"), sparkf.col("author2"), \
     node_proximity(sparkf.col("author1_org_rank"), sparkf.col("author2_org_rank")).alias("org_rank_proximity"), \
     sparkf.col("label") \
 )

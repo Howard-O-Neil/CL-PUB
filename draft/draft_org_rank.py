@@ -19,8 +19,8 @@ import pyspark.sql.functions as sparkf
 import copy
 import uuid
 
-org_rank_dir        = "s3://recsys-bucket-1/data_lake/arnet/tables/org_rank_algo/iter-14"
-org_vertex_dir      = "s3://recsys-bucket-1/data_lake/arnet/tables/org_vertex/merge-0"
+org_rank_dir        = "gs://clpub/data_lake/arnet/tables/org_rank_algo/iter-14"
+org_vertex_dir      = "gs://clpub/data_lake/arnet/tables/org_vertex/merge-0"
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate())
 

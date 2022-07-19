@@ -21,8 +21,8 @@ import uuid
 
 count_parquet       = 0
 # source              = "/home/hadoop/virtual/data/dataset/arnet/citation/dblpv13.json"
-source              = "/recsys/dataset/arnet/citation/dblpv13.json"
-save_prefix         = "/home/hadoop/spark/arnet/tables/coauthor/parts/"
+source              = "/home/howard/recsys/dataset/dblpv13.json"
+save_prefix         = "gs://clpub/data_lake/arnet/tables/coauthor/parts/"
 INSERT_THRESHOLD    = 300000
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate())

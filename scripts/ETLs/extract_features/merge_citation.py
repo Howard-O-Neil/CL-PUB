@@ -18,8 +18,8 @@ from pyspark.sql.types import StructType, StructField, StringType, LongType, Int
 import copy
 import uuid
 
-file_prefix = "s3://recsys-bucket-1/data_lake/arnet/tables/citation/parts/"
-dst_dir     = "s3://recsys-bucket-1/data_lake/arnet/tables/citation/merge-0"
+file_prefix = "gs://clpub/data_lake/arnet/tables/citation/parts/"
+dst_dir     = "gs://clpub/data_lake/arnet/tables/citation/merge-0"
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate())
 
@@ -38,7 +38,7 @@ schema = StructType([
 
 sources = []
 
-# 119 files recorded
+# 438 files recorded
 for i in range(0, 438):
     sources.append(file_prefix + "part-" + str(i))
 
@@ -66,4 +66,4 @@ new_df = spark.sql("""
 """)
 
 # 4*3 = 12 core cluster, 12*5 partition
-new_df.repartition(60).write.mode("overwrite").format("parquet").save(dst_dir)
+new_df.write.mode("overwrite").format("parquet").save(dst_dir)

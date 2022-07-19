@@ -13,7 +13,7 @@ import org.apache.spark.sql.{types => sparkSQL_T}
 object App {
     val src = 5L
     val dst = 2L
-    val dst_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/test_all_path/merge-0"
+    val dst_dir = "gs://clpub/data_lake/arnet/tables/test_all_path/merge-0"
 
     def main(args: Array[String]) = {
         val spark = (SparkSession.builder.getOrCreate())

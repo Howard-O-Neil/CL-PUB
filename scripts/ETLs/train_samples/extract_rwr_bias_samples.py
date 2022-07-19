@@ -4,11 +4,11 @@ import pyspark.sql.functions as sparkf
 
 spark = SparkSession.builder.getOrCreate()
 
-sample_dir      = "s3://recsys-bucket-1/data_lake/arnet/tables/train_samples/merge-0"
-rwr_bias_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/author_rwr_bias/merge-0"
-dst_dir         = "s3://recsys-bucket-1/data_lake/arnet/tables/rwr_bias_sample_train/merge-0"
+sample_dir      = "gs://clpub/data_lake/arnet/tables/train_samples/merge-0"
+rwr_bias_dir    = "gs://clpub/data_lake/arnet/tables/author_rwr_bias/merge-0"
+dst_dir         = "gs://clpub/data_lake/arnet/tables/rwr_bias_sample_train/merge-0"
 
-optimized_partition_num = 2500
+optimized_partition_num = 200
 
 sample_schema = StructType([
     StructField("author1", StringType(), False),

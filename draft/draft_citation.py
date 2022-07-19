@@ -19,8 +19,8 @@ from pyspark.sql.types import StructType, StructField, StringType, LongType, Int
 import copy
 import uuid
 
-citation_dir        = "s3://recsys-bucket-1/data_lake/arnet/tables/citation/merge-0"
-file_prefix = "s3://recsys-bucket-1/data_lake/arnet/tables/citation/parts/"
+citation_dir        = "gs://clpub/data_lake/arnet/tables/citation/merge-0"
+file_prefix = "gs://clpub/data_lake/arnet/tables/citation/parts/"
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate())
 

@@ -4,7 +4,7 @@ CREATE EXTERNAL TABLE published_history (
     `paper_id` STRING, `paper_title` STRING, `year` FLOAT
 ) 
 STORED AS PARQUET
-LOCATION 's3://recsys-bucket-1/data_lake/arnet/tables/published_history/merge-0/'
+LOCATION 'gs://clpub/data_lake/arnet/tables/published_history/merge-0/'
 TBLPROPERTIES ('external.table.purge'='false');
 
 CREATE EXTERNAL TABLE coauthor (
@@ -15,5 +15,5 @@ CREATE EXTERNAL TABLE coauthor (
     `year` FLOAT
 )
 STORED AS PARQUET
-LOCATION 's3://recsys-bucket-1/data_lake/arnet/tables/coauthor/merge-0'
+LOCATION 'gs://clpub/data_lake/arnet/tables/coauthor/merge-0'
 TBLPROPERTIES ('external.table.purge'='false');

@@ -4,9 +4,9 @@ import pyspark.sql.functions as sparkf
 
 spark = SparkSession.builder.getOrCreate()
 
-positive_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/coauthor_positive_train/merge-0"
-negative_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/coauthor_negative_train/merge-0"
-dst_dir         = "s3://recsys-bucket-1/data_lake/arnet/tables/train_samples/merge-0"
+positive_dir    = "gs://clpub/data_lake/arnet/tables/coauthor_positive_train/merge-0"
+negative_dir    = "gs://clpub/data_lake/arnet/tables/coauthor_negative_train/merge-0"
+dst_dir         = "gs://clpub/data_lake/arnet/tables/train_samples/merge-0"
 
 sample_schema = StructType([
     StructField("author1", StringType(), False),
@@ -28,4 +28,9 @@ sample_shuffle_df.filter((sparkf.col("label") == 1)).count()
 
 sample_shuffle_df.show()
 
-sample_shuffle_df.write.mode("overwrite").parquet(dst_dir)
+sample_shuffle_df.createOrReplaceTempView("sample_shuffle")
+
+spark.sql("""
+    select ss.author1, ss.author2, ss.label
+    from sample_shuffle TABLESAMPLE (10000000 ROWS) as ss
+""").repartition(200).write.mode("overwrite").parquet(dst_dir)

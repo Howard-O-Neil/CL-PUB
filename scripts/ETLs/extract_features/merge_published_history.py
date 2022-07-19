@@ -18,8 +18,8 @@ from pyspark.sql.types import StructType, StructField, StringType, LongType, Int
 import copy
 import uuid
 
-file_prefix = "s3://recsys-bucket-1/data_lake/arnet/tables/published_history/parts/"
-dst_dir     = "s3://recsys-bucket-1/data_lake/arnet/tables/published_history/merge-0"
+file_prefix = "gs://clpub/data_lake/arnet/tables/published_history/parts/"
+dst_dir     = "gs://clpub/data_lake/arnet/tables/published_history/merge-0"
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate())
 
@@ -71,4 +71,4 @@ if check:
     """).show(vertical=True)
 
 # 4*3 = 12 core cluster, 12*5 partition
-new_df.repartition(60).write.mode("overwrite").format("parquet").save(dst_dir)
+new_df.write.mode("overwrite").format("parquet").save(dst_dir)

@@ -4,8 +4,8 @@ import pyspark.sql.functions as sparkf
 
 spark = SparkSession.builder.getOrCreate()
 
-coauthor_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/coauthor/merge-0"
-dst_dir         = "s3://recsys-bucket-1/data_lake/arnet/tables/coauthor_positive_test/merge-0"
+coauthor_dir    = "gs://clpub/data_lake/arnet/tables/coauthor/merge-0"
+dst_dir         = "gs://clpub/data_lake/arnet/tables/coauthor_positive_test/merge-0"
 
 coauthor_schema = StructType([
     StructField('_id', StringType(), False),

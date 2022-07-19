@@ -4,9 +4,9 @@ import pyspark.sql.functions as sparkf
 
 spark = SparkSession.builder.getOrCreate()
 
-sample_dir          = "s3://recsys-bucket-1/data_lake/arnet/tables/train_samples/merge-0"
-org_discrete_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/author_org_discrete/merge-0"
-dst_dir             = "s3://recsys-bucket-1/data_lake/arnet/tables/org_discrete_sample_train/merge-0"
+sample_dir          = "gs://clpub/data_lake/arnet/tables/train_samples/merge-0"
+org_discrete_dir    = "gs://clpub/data_lake/arnet/tables/author_org_discrete/merge-0"
+dst_dir             = "gs://clpub/data_lake/arnet/tables/org_discrete_sample_train/merge-0"
 
 optimized_partition_num = 2000
 

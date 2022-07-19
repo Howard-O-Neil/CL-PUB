@@ -1,35 +1,12 @@
-import os
-os.environ["SPARK_HOME"] = "/usr/lib/spark"
-os.environ["HADOOP_CONF_DIR"] = "/etc/hadoop/conf"
-os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-1.8.0-amazon-corretto.x86_64"
-
-import findspark
-findspark.init()
-
 from pyspark.sql import SparkSession
 from pyspark.conf import SparkConf
 from pyspark.context import SparkContext
 from pyspark.sql.types import StructType, StructField, StringType, LongType, IntegerType, FloatType, ArrayType
 import pyspark.sql.functions as sparkf
 
-training_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/training/merge-0"
+training_dir = "gs://clpub/data_lake/arnet/tables/training/merge-0"
 
-spark_conf = SparkConf()
-
-emr_conf_f = open("/home/hadoop/emr_env.txt")
-conf_lines = emr_conf_f.readlines()
-
-for conf in conf_lines:
-    conf_set = conf.strip().split(";")
-    spark_conf.set(conf_set[0], conf_set[1])
-
-# .config("spark.scheduler.maxRegisteredResourcesWaitingTime", "3600s") \
-# .config("spark.scheduler.minRegisteredResourcesRatio", "1.0") \
-spark = SparkSession.builder \
-            .appName("AI model") \
-            .config(conf=spark_conf) \
-            .config("spark.executor.memory", "10g") \
-            .getOrCreate()
+spark = SparkSession.builder.getOrCreate()
 
 import torch
 import tensorflow as tf
@@ -38,17 +15,15 @@ import numpy as np
 spark.read.parquet(training_dir).createOrReplaceTempView("train_view")
 
 train_samples_bigdl = spark.sql("""
-    select tv.cos_dist as f1, tv.org_rank_proximity as f2, tv.rwr_bias_proximity as f3,
+    select tv.cos_dist as f1, tv.rwr_bias_proximity as f2, tv.org_rank_proximity as f3,
         cast((CASE WHEN tv.label = 0 THEN -1 ELSE 1 END) as int) as label
     from train_view as tv
 """)
 
 train_samples_np = np.array(train_samples_bigdl.collect())
 
-spark.stop()
-
-feature_np = train_samples_np[:, 0:3]
-label_np = train_samples_np[:, 3:4]
+feature_np = train_samples_np[:, 0:3].astype(np.float32)
+label_np = train_samples_np[:, 3:4].astype(np.int32)
 
 global_seed = 5499
 tf.random.set_seed(global_seed)
@@ -58,7 +33,7 @@ SVM_threshold = 0.0
 def model_creator(config):
     x_inputs = tf.keras.Input(shape=(3,))
 
-    initializer = tf.keras.initializers.HeNormal(seed=global_seed)
+    initializer = tf.keras.initializers.HeNormal()
     regularizer = tf.keras.regularizers.L2(0.00005)
 
     linear1 = tf.keras.layers.Dense(units=32, \
@@ -113,12 +88,13 @@ model = model_creator(None)
 
 batch_size = 32768
 
-history_file = "/home/hadoop/model/re4/train.csv"
+history_dir = "/home/howard/recsys/model/re4"
+
+history_file = f"{history_dir}/train.csv"
 history_logger=tf.keras.callbacks.CSVLogger(history_file, separator=",", append=False)
 
 history = model.fit(feature_np, label_np, batch_size=batch_size, epochs=25, shuffle=True, callbacks=[history_logger])
 
-model.save_weights("/home/hadoop/model/re4/model.h5")
+model.save_weights(f"{history_dir}/model.h5")
 
 print("\n\n ===== DONED ===== \n\n")
-

@@ -12,7 +12,7 @@ from pyspark.context import SparkContext
 from pyspark.sql.types import StructType, StructField, StringType, LongType, IntegerType, FloatType, ArrayType
 import pyspark.sql.functions as sparkf
 
-training_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/training/merge-0"
+training_dir = "gs://clpub/data_lake/arnet/tables/training/merge-0"
 
 spark_conf = SparkConf()
 

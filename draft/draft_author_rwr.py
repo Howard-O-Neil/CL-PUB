@@ -19,12 +19,12 @@ import pyspark.sql.functions as sparkf
 import copy
 import uuid
 
-author_rwr_dir          = "s3://recsys-bucket-1/data_lake/arnet/tables/author_rwr/merge-0"
-author_rwr_bias_dir     = "s3://recsys-bucket-1/data_lake/arnet/tables/author_rwr_bias/merge-0"
-published_history_dir   = "s3://recsys-bucket-1/data_lake/arnet/tables/published_history/merge-0"
-citation_vertex_dir     = "s3://recsys-bucket-1/data_lake/arnet/tables/citation_vertex/merge-0"
-citation_rwr_dir        = "s3://recsys-bucket-1/data_lake/arnet/tables/citation_rwr/iter-14"
-citation_rwr_bias_dir   = "s3://recsys-bucket-1/data_lake/arnet/tables/citation_rwr_bias/iter-14"
+author_rwr_dir          = "gs://clpub/data_lake/arnet/tables/author_rwr/merge-0"
+author_rwr_bias_dir     = "gs://clpub/data_lake/arnet/tables/author_rwr_bias/merge-0"
+published_history_dir   = "gs://clpub/data_lake/arnet/tables/published_history/merge-0"
+citation_vertex_dir     = "gs://clpub/data_lake/arnet/tables/citation_vertex/merge-0"
+citation_rwr_dir        = "gs://clpub/data_lake/arnet/tables/citation_rwr/iter-14"
+citation_rwr_bias_dir   = "gs://clpub/data_lake/arnet/tables/citation_rwr_bias/iter-14"
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate())
 
