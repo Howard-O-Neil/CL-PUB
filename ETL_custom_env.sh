@@ -38,6 +38,7 @@ python -m pip install --upgrade thrift
 python -m pip install --upgrade thrift-sasl
 python -m pip install --upgrade 'pyhive[presto]'
 python -m pip install --upgrade 'pyhive[hive]'
+python -m pip install --upgrade 'pyhive[trino]'
 
 # use within python os environ
 export HADOOP_CONF_DIR=/etc/hadoop/conf
