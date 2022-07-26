@@ -33,8 +33,12 @@ author_org_rank_df.createOrReplaceTempView("author_org_rank_df")
 
 author_org_rank_df.count()
 
+# tin huynh id  : 53f47e76dabfaec09f299f95
+# kiem hoang id : 53f466c4dabfaeb22f53ee97 
+
 spark.sql("""
     select *
     from author_org_rank_df
-    where computed = 1
+    where author_id = '53f47e76dabfaec09f299f95'
+        or author_id = '53f466c4dabfaeb22f53ee97'
 """).show()

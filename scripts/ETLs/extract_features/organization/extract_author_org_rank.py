@@ -73,13 +73,12 @@ unique_author_df = spark.sql("""
 """)
 unique_author_df.createOrReplaceTempView("unique_author_df")
 
-max_val = spark.sql("select max(node._1) as max_val from org_rank_df").collect()[0]['max_val']
-min_val = spark.sql("select min(node._1) as min_val from org_rank_df").collect()[0]['min_val']
+# max_val = spark.sql("select max(node._1) as max_val from org_rank_df").collect()[0]['max_val']
+# min_val = spark.sql("select min(node._1) as min_val from org_rank_df").collect()[0]['min_val']
 
 author_org_rank_df = spark.sql(f"""
     select phd.author_id, phd.author_org,
-        cast((CASE WHEN org_r.org_name IS NULL THEN 0 
-            ELSE (((org_r.rank - {min_val}) / ({max_val} - {min_val})) + 0.005) END) as float) org_rank,
+        cast((CASE WHEN org_r.org_name IS NULL THEN 0 ELSE org_r.rank END) as float) org_rank,
         (CASE WHEN org_r.org_name IS NULL THEN 0 ELSE 1 END) computed
     from unique_author_df as phd
         left join (

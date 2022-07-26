@@ -17,9 +17,9 @@ spark.read.parquet(author_rwr_bias_dir).createOrReplaceTempView("author_rwr_bias
 spark.read.parquet(author_org_rank_dir).createOrReplaceTempView("author_org_rank")
 
 spark.sql("""
-    select first_value(author_id) as author_id, author_name
+    select author_id, first_value(author_name) as author_name
     from published_history
-    group by author_name
+    group by author_id
 """).createOrReplaceTempView("unique_author")
 
 user_feature = spark.sql("""

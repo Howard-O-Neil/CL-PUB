@@ -13,8 +13,19 @@ from pyspark.sql.types import StructType, StructField, StringType, LongType, Int
 import pyspark.sql.functions as sparkf
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+    "http://127.0.0.1",
+    "http://127.0.0.1:3000",
+]
+
 import numpy as np
 import tensorflow as tf
+
+indexing_scale = np.array([0.3, 0.6, 1.0]).astype(np.float32)
 
 def create_spark_session():
     spark_conf = SparkConf()
@@ -33,6 +44,11 @@ def create_spark_session():
                 .getOrCreate()
 
 spark = create_spark_session()
+
+from pyhive import trino
+
+trino_conn = trino.Connection(host="localhost", port='8098', catalog='hive', schema='default', protocol='http')
+trino_cursor = trino_conn.cursor()
 
 def load_model_re4():
     def model_creator(config):
@@ -96,15 +112,57 @@ def load_model_re4():
 
 ranker = load_model_re4()
 
-user_features = spark.read.parquet("gs://clpub/data_lake/arnet/tables/user_feature/re4/merge-0").limit(100).collect()
+print("===== Collecting user features =====")
 
-user_id = [r["author_id"] for r in user_features]
-user_name = [r["author_name"] for r in user_features]
-user_content_vect = [r["feature"] for r in user_features]
-user_ranking = [r["ranking"] for r in user_features]
-user_org_rank = [r["org_rank"] for r in user_features]
+trino_cursor.execute("""
+    SELECT author_id, author_name, feature, ranking, org_rank
+    FROM author_feature
+""")
 
-user_content_vect_float = [list(map(lambda x: float(x), r.split(";"))) for r in user_content_vect]
+feature_fetch_res = trino_cursor.fetchall()
+
+# # This will cause very high ram usage, each numpy element has fixed equal allocated space
+# user_features = np.array(feature_fetch_res).astype(object)
+
+import multiprocessing
+
+def parsing_feature_worker(idx, fetch, manager_dict):
+    if idx <= 2:
+        manager_dict[str(idx)] = [r[idx] for r in fetch] 
+    else:
+        manager_dict[str(idx)] = [float(r[idx]) for r in fetch] 
+
+worker_manager = multiprocessing.Manager()
+manager_dict = worker_manager.dict()
+
+jobs = []
+
+for i in range(5):
+    p = multiprocessing.Process(\
+        target=parsing_feature_worker,\
+        args=(i, feature_fetch_res, manager_dict,))
+    
+    jobs.append(p)
+
+for i in range(0, 3): jobs[i].start()
+for i in range(0, 3): jobs[i].join()
+
+for i in range(3, 5): jobs[i].start()
+for i in range(3, 5): jobs[i].join()
+
+user_id             = manager_dict['0']
+user_name           = manager_dict['1']
+user_content_vect   = manager_dict['2']
+user_ranking        = manager_dict['3']
+user_org_rank       = manager_dict['4']
+
+user_content_vect_float = [
+    [float(x1) for x1 in x.split(";")] for x in user_content_vect
+]
+
+print("===== Done, user features collected! ===== \n")
+
+print("===== Calculating indexing =====")
 
 np_user_content_full = np.array(user_content_vect_float).astype(np.float32) 
 np_user_content = np.expand_dims(
@@ -113,42 +171,69 @@ np_user_content = np.expand_dims(
 np_ranking = np.expand_dims(np.array(user_ranking).astype(np.float32), axis=1)
 np_org_rank = np.expand_dims(np.array(user_org_rank).astype(np.float32), axis=1)
 
-np_features = np.hstack((np.hstack((np_user_content, np_ranking)), np_org_rank))
+from sklearn import preprocessing
+content_scaler      = preprocessing.StandardScaler()
+ranking_scaler      = preprocessing.StandardScaler()
+org_rank_scaler     = preprocessing.StandardScaler()
+
+content_scaler.fit(np_user_content)
+ranking_scaler.fit(np_ranking)
+org_rank_scaler.fit(np_org_rank) 
+
+np_features = np.multiply(
+    np.hstack((
+        np.hstack((
+            content_scaler.transform(np_user_content),
+            ranking_scaler.transform(np_ranking))),
+        org_rank_scaler.transform(np_org_rank))), indexing_scale)
 
 import faiss
 from scipy.spatial import distance as sci_distance
 
-index = faiss.index_factory(3, "L2norm,IVF1,Flat", faiss.METRIC_INNER_PRODUCT)
+feature_dimen   = 3
+num_cluster     = 10000
+num_search      = 1000
+quantizer = faiss.IndexFlatL2(feature_dimen)  # the other index
+index = faiss.IndexIVFFlat(quantizer, feature_dimen, 10000)
 
 index.train(np_features)
 index.add(np_features)
 
-distance, idx = index.search(np.array([np_features[5]]), 100)
+print("===== Done, index calculated! ===== \n")
+
+index.nprobe = num_search
+
+# # Ugly mock testing
+# distance, idx = index.search(np.array([np_features[5]]), 100)
 
 # Please squeeze first dimension of list_idx like below before passing
-# np.squeeze(idx, axis=0)
-def cal_collab_ranking(user_idx, list_idx):
+# new_idx, collab_rank = cal_collab_ranking(5, np.squeeze(idx, axis=0))
+# user_idx = single integer
+def cal_collab_ranking(user_feature, list_idx):
     vect_prox = []
     for vect in np_user_content_full[list_idx].tolist():
-        user_vect = np_user_content_full[user_idx].tolist()
+        # user_vect = np_user_content_full[user_idx].tolist()
+        user_vect = user_feature[0]
         cos_dis = np.float32(sci_distance.cosine(user_vect, vect)).astype(float).item()
         vect_prox.append(cos_dis)
 
     ranking_prox = []
     for rank in np_ranking[list_idx].tolist():
-        user_rank = np_ranking[user_idx].item()
-        proximity = abs(user_rank - rank) \
-            / max(abs(user_rank), abs(rank))
+        # user_rank = np_ranking[user_idx].item()
+        user_rank = user_feature[1]
+        proximity = abs(user_rank - rank[0]) \
+            / max(abs(user_rank), abs(rank[0]))
 
-        ranking.append(proximity)
+        ranking_prox.append(proximity)
 
     org_rank_prox = []
     for org_rank in np_org_rank[list_idx].tolist():
-        user_org_rank = np_org_rank[user_idx].item()
+        # user_org_rank = np_org_rank[user_idx].item()
+        user_org_rank = user_feature[2]
         proximity = 1
-        if user_org_rank > 0 or org_rank > 0:
-            proximity = abs(user_org_rank - org_rank) \
-                / max(abs(user_org_rank), abs(org_rank))
+        if user_org_rank > 0 or org_rank[0] > 0:
+            proximity = abs(user_org_rank - org_rank[0]) \
+                / max(abs(user_org_rank), abs(org_rank[0]))
 
         org_rank_prox.append(proximity)
 
@@ -162,12 +247,19 @@ def cal_collab_ranking(user_idx, list_idx):
 
     idx_sort = np.flip(np.argsort(collab_rank.flatten()), 0)
 
-    return np.hstack((
-        np.expand_dims(list_idx, axis=1),
-        np.expand_dims(collab_rank, axis=1)
-    ))[idx_sort]
+    return list_idx[idx_sort], collab_rank[idx_sort]
+
+# ===== APIs =====
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 async def root():
@@ -182,18 +274,71 @@ async def root():
 
 @app.get("/search_author")
 async def search_author(name: str):
-    res_rows = spark.sql(f"""
-        select author_id, author_name
-        from author
-        where author_name like '%{name}%'
-        limit 1000
-    """).collect()
+    low_name = name.lower()
 
-    res = [{
-            "author_id": r["author_id"],
-            "author_name": r["author_name"]
-        } for r in res_rows]
+    trino_cursor.execute(f"""
+        SELECT author_id, author_name
+        FROM author_feature
+        WHERE LOWER(author_name) LIKE '%{low_name}%'
+        LIMIT 200
+    """)
+    rows = trino_cursor.fetchall()
 
     return {
-        "result": res
+        "result": [{
+            "author_id": r[0],
+            "author_name": r[1]
+        } for r in rows]
+    }
+
+top_k_ann = 10000
+top_k_recommend = 50
+
+# Tin Huynh Id: 53f47e76dabfaec09f299f95
+@app.get("/recommend")
+async def recommend_author(id: str):
+    trino_cursor.execute(f"""
+        SELECT author_id, author_name, feature, ranking, org_rank
+        FROM author_feature
+        WHERE author_id = '{id}'
+    """)
+
+    user_row = trino_cursor.fetchall()[0]
+
+    user_feature_content = list(map(lambda x: float(x), user_row[2].split(";")))
+    user_feature_rank = user_row[3]
+    user_feature_org_rank = user_row[4]
+
+    np_user_feature_content = np.expand_dims(
+        [np.mean(np.array(user_feature_content).astype(np.float32), axis=0)], axis=0)
+    np_user_feature_rank = np.expand_dims(np.array([user_feature_rank]).astype(np.float32), axis=1)
+    np_user_feature_org_rank = np.expand_dims(np.array([user_feature_org_rank]).astype(np.float32), axis=1)
+
+    np_user_feature = np.multiply(
+        np.hstack((
+            np.hstack((
+                content_scaler.transform(np_user_feature_content), 
+                ranking_scaler.transform(np_user_feature_rank))), 
+            org_rank_scaler.transform(np_user_feature_org_rank))),
+        indexing_scale)
+
+    distances, idxs = index.search(np.array(np_user_feature), top_k_ann)
+
+    sorted_idx, collab_rank = cal_collab_ranking([user_feature_content, user_feature_rank, user_feature_org_rank], \
+        np.squeeze(idxs, axis=0))
+    
+    lst_sorted_idx = sorted_idx[0:top_k_recommend].tolist()
+    lst_collab_rank = collab_rank[0:top_k_recommend].tolist()
+    
+    rec_author = []
+
+    for _i, i in enumerate(lst_sorted_idx):
+        rec_author.append({
+            "author_id": user_id[i],
+            "author_name": user_name[i],
+            "author_rank": lst_collab_rank[_i]
+        })
+
+    return {
+        "result": rec_author
     }
