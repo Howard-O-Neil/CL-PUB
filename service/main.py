@@ -25,7 +25,7 @@ origins = [
 import numpy as np
 import tensorflow as tf
 
-indexing_scale = np.array([0.3, 0.6, 1.0]).astype(np.float32)
+indexing_scale = np.array([0.2, 0.35, 1.0]).astype(np.float32)
 
 def create_spark_session():
     spark_conf = SparkConf()
@@ -324,8 +324,11 @@ async def recommend_author(id: str):
 
     distances, idxs = index.search(np.array(np_user_feature), top_k_ann)
 
+    query_idx = user_id.index(id)
+    squeezed_idxs = np.squeeze(idxs, axis=0)
+
     sorted_idx, collab_rank = cal_collab_ranking([user_feature_content, user_feature_rank, user_feature_org_rank], \
-        np.squeeze(idxs, axis=0))
+        squeezed_idxs[squeezed_idxs != query_idx])
     
     lst_sorted_idx = sorted_idx[0:top_k_recommend].tolist()
     lst_collab_rank = collab_rank[0:top_k_recommend].tolist()
