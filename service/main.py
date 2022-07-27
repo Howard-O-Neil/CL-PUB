@@ -25,7 +25,7 @@ origins = [
 import numpy as np
 import tensorflow as tf
 
-indexing_scale = np.array([0.2, 0.35, 1.0]).astype(np.float32)
+indexing_scale = [0.25, 0.45, 0.95]
 
 def create_spark_session():
     spark_conf = SparkConf()
@@ -124,50 +124,71 @@ feature_fetch_res = trino_cursor.fetchall()
 # # This will cause very high ram usage, each numpy element has fixed equal allocated space
 # user_features = np.array(feature_fetch_res).astype(object)
 
+import pickle
+pickle_dir = "/home/howard/recsys/faiss/re4"
+
 import multiprocessing
 
-def parsing_feature_worker(idx, fetch, manager_dict):
-    if idx <= 2:
-        manager_dict[str(idx)] = [r[idx] for r in fetch] 
-    else:
-        manager_dict[str(idx)] = [float(r[idx]) for r in fetch] 
+list_pickles = os.listdir(pickle_dir)
 
-worker_manager = multiprocessing.Manager()
-manager_dict = worker_manager.dict()
+if "success.p" in list_pickles:
+    user_id                     = pickle.load(open(f"{pickle_dir}/user_id.p", "rb"))
+    user_name                   = pickle.load(open(f"{pickle_dir}/user_name.p", "rb"))
+    user_content_vect           = pickle.load(open(f"{pickle_dir}/user_content_vect.p", "rb"))
+    user_ranking                = pickle.load(open(f"{pickle_dir}/user_ranking.p", "rb"))
+    user_org_rank               = pickle.load(open(f"{pickle_dir}/user_org_rank.p", "rb"))
+    user_content_vect_float     = pickle.load(open(f"{pickle_dir}/user_content_vect_float.p", "rb"))
+else:
+    def parsing_feature_worker(idx, fetch, manager_dict):
+        if idx <= 2:
+            manager_dict[str(idx)] = [r[idx] for r in fetch] 
+        else:
+            manager_dict[str(idx)] = [float(r[idx]) for r in fetch]
 
-jobs = []
+    worker_manager = multiprocessing.Manager()
+    manager_dict = worker_manager.dict()
 
-for i in range(5):
-    p = multiprocessing.Process(\
-        target=parsing_feature_worker,\
-        args=(i, feature_fetch_res, manager_dict,))
-    
-    jobs.append(p)
+    jobs = []
 
-for i in range(0, 3): jobs[i].start()
-for i in range(0, 3): jobs[i].join()
+    for i in range(5):
+        p = multiprocessing.Process(\
+            target=parsing_feature_worker,\
+            args=(i, feature_fetch_res, manager_dict,))
+        
+        jobs.append(p)
 
-for i in range(3, 5): jobs[i].start()
-for i in range(3, 5): jobs[i].join()
+    for i in range(0, 3): jobs[i].start()
+    for i in range(0, 3): jobs[i].join()
 
-user_id             = manager_dict['0']
-user_name           = manager_dict['1']
-user_content_vect   = manager_dict['2']
-user_ranking        = manager_dict['3']
-user_org_rank       = manager_dict['4']
+    for i in range(3, 5): jobs[i].start()
+    for i in range(3, 5): jobs[i].join()
 
-user_content_vect_float = [
-    [float(x1) for x1 in x.split(";")] for x in user_content_vect
-]
+    user_id             = manager_dict['0']
+    user_name           = manager_dict['1']
+    user_content_vect   = manager_dict['2']
+    user_ranking        = manager_dict['3']
+    user_org_rank       = manager_dict['4']
+
+    user_content_vect_float = [
+        [float(x1) for x1 in x.split(";")] for x in user_content_vect
+    ]
+
+    save_msg = {"msg": "SUCCESS"}
+
+    pickle.dump(save_msg, open(f"{pickle_dir}/success.p", "wb"))
+    pickle.dump(user_id, open(f"{pickle_dir}/user_id.p", "wb"))
+    pickle.dump(user_name, open(f"{pickle_dir}/user_name.p", "wb"))
+    pickle.dump(user_content_vect, open(f"{pickle_dir}/user_content_vect.p", "wb"))
+    pickle.dump(user_ranking, open(f"{pickle_dir}/user_ranking.p", "wb"))
+    pickle.dump(user_org_rank, open(f"{pickle_dir}/user_org_rank.p", "wb"))
+    pickle.dump(user_content_vect_float, open(f"{pickle_dir}/user_content_vect_float.p", "wb"))
+
 
 print("===== Done, user features collected! ===== \n")
 
 print("===== Calculating indexing =====")
 
-np_user_content_full = np.array(user_content_vect_float).astype(np.float32) 
-np_user_content = np.expand_dims(
-    np.mean(np.array(user_content_vect_float).astype(np.float32), axis=1), axis=1
-)
+np_user_content = np.array(user_content_vect_float).astype(np.float32)
 np_ranking = np.expand_dims(np.array(user_ranking).astype(np.float32), axis=1)
 np_org_rank = np.expand_dims(np.array(user_org_rank).astype(np.float32), axis=1)
 
@@ -180,24 +201,39 @@ content_scaler.fit(np_user_content)
 ranking_scaler.fit(np_ranking)
 org_rank_scaler.fit(np_org_rank) 
 
-np_features = np.multiply(
-    np.hstack((
+np_features = np.hstack((
         np.hstack((
-            content_scaler.transform(np_user_content),
-            ranking_scaler.transform(np_ranking))),
-        org_rank_scaler.transform(np_org_rank))), indexing_scale)
+            np.multiply(content_scaler.transform(np_user_content), indexing_scale[0]),
+            np.multiply(ranking_scaler.transform(np_ranking), indexing_scale[1]))),
+        np.multiply(org_rank_scaler.transform(np_org_rank), indexing_scale[2]))).astype(np.float32)
 
 import faiss
+from faiss import index_factory
 from scipy.spatial import distance as sci_distance
 
-feature_dimen   = 3
+feature_dimen   = 66
 num_cluster     = 10000
-num_search      = 1000
-quantizer = faiss.IndexFlatL2(feature_dimen)  # the other index
-index = faiss.IndexIVFFlat(quantizer, feature_dimen, 10000)
+num_search      = int(num_cluster * 0.2) # 20% Database
 
-index.train(np_features)
-index.add(np_features)
+if "search.index" not in os.listdir(pickle_dir):
+    print("=== Training index ...")
+
+    # Indexed with HNSW
+    # Vector transform PCAW
+    # PQ fast scan encoding
+    # 65536 centroids
+
+    # PCA technique is meant to be compressed vector, of course input vector must be larger
+    # Output dimension after transform must be multiple of numer PQ subquantizers
+    index =  index_factory(feature_dimen, f"OPQ16_32,IVF{num_cluster}_HNSW32,PQ16x4fs")
+
+    index.train(np_features)
+    index.add(np_features)
+
+    faiss.write_index(index, f"{pickle_dir}/search.index")
+else:
+    print("=== Loading index ...")
+    index = faiss.read_index(f"{pickle_dir}/search.index")
 
 print("===== Done, index calculated! ===== \n")
 
@@ -211,8 +247,8 @@ index.nprobe = num_search
 # user_idx = single integer
 def cal_collab_ranking(user_feature, list_idx):
     vect_prox = []
-    for vect in np_user_content_full[list_idx].tolist():
-        # user_vect = np_user_content_full[user_idx].tolist()
+    for vect in np_user_content[list_idx].tolist():
+        # user_vect = np_user_content[user_idx].tolist()
         user_vect = user_feature[0]
         cos_dis = np.float32(sci_distance.cosine(user_vect, vect)).astype(float).item()
         vect_prox.append(cos_dis)
@@ -291,7 +327,7 @@ async def search_author(name: str):
         } for r in rows]
     }
 
-top_k_ann = 10000
+top_k_ann = 5000
 top_k_recommend = 50
 
 # Tin Huynh Id: 53f47e76dabfaec09f299f95
@@ -310,19 +346,18 @@ async def recommend_author(id: str):
     user_feature_org_rank = user_row[4]
 
     np_user_feature_content = np.expand_dims(
-        [np.mean(np.array(user_feature_content).astype(np.float32), axis=0)], axis=0)
+        np.array(user_feature_content).astype(np.float32), axis=0)
     np_user_feature_rank = np.expand_dims(np.array([user_feature_rank]).astype(np.float32), axis=1)
-    np_user_feature_org_rank = np.expand_dims(np.array([user_feature_org_rank]).astype(np.float32), axis=1)
+    np_user_feature_org_rank = np.expand_dims(
+        np.array([user_feature_org_rank]).astype(np.float32), axis=1)
 
-    np_user_feature = np.multiply(
-        np.hstack((
+    np_user_feature = np.hstack((
             np.hstack((
-                content_scaler.transform(np_user_feature_content), 
-                ranking_scaler.transform(np_user_feature_rank))), 
-            org_rank_scaler.transform(np_user_feature_org_rank))),
-        indexing_scale)
+                np.multiply(content_scaler.transform(np_user_feature_content), indexing_scale[0]), 
+                np.multiply(ranking_scaler.transform(np_user_feature_rank), indexing_scale[1]))), 
+            np.multiply(org_rank_scaler.transform(np_user_feature_org_rank), indexing_scale[2]))).astype(np.float32)
 
-    distances, idxs = index.search(np.array(np_user_feature), top_k_ann)
+    distances, idxs = index.search(np_user_feature, top_k_ann)
 
     query_idx = user_id.index(id)
     squeezed_idxs = np.squeeze(idxs, axis=0)
