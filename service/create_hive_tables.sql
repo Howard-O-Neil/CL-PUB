@@ -36,3 +36,10 @@ CREATE EXTERNAL TABLE paper_info (
 STORED AS PARQUET
 LOCATION 'gs://clpub/data_lake/arnet/tables/papers/merge-0'
 TBLPROPERTIES ('external.table.purge'='false');
+
+CREATE EXTERNAL TABLE organization (
+    `name` STRING
+)
+STORED AS PARQUET
+LOCATION 'gs://clpub/data_lake/arnet/tables/distinct_org/merge-0'
+TBLPROPERTIES ('external.table.purge'='false');

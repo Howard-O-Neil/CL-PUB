@@ -74,7 +74,9 @@ PYSPARK_PYTHON=/home/howard/miniconda3/envs/pyenv/bin/python spark-submit \
     -c spark.ui.showConsoleProgress=true \
     --master local[4] \
     gs://clpub/source/ETLs/extract_features/merge_coauthor.py \
+
 # >>>>>
+
 
 # <<<<< Install + Deploy trino <<<<<
 # Default presto suck

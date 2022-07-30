@@ -1,291 +1,22 @@
 import os
-os.environ["SPARK_HOME"] = "/usr/lib/spark"
-os.environ["HADOOP_CONF_DIR"] = "/etc/hadoop/conf"
-os.environ["JAVA_HOME"] = "/usr/lib/jvm/temurin-8-jdk-amd64"
-
-import findspark
-findspark.init()
-
-from pyspark.sql import SparkSession
-from pyspark.conf import SparkConf
-from pyspark.context import SparkContext
-from pyspark.sql.types import StructType, StructField, StringType, LongType, IntegerType, FloatType, ArrayType
-import pyspark.sql.functions as sparkf
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
-origins = [
-    "http://localhost",
-    "http://localhost:3000",
-    "http://127.0.0.1",
-    "http://127.0.0.1:3000",
-]
+# Just load 1 time per script
+# Dont worry :)))
+import loader
+from loader import spark, trino_cursor, origins, \
+    user_id, user_name, user_content_vect, user_ranking, user_org_rank, user_content_vect_float, \
+    np_user_content, np_user_content_med, np_ranking, np_org_rank, \
+    content_scaler, ranking_scaler, org_rank_scaler, np_features, \
+    ranker, index, indexing_scale, \
+    cal_collab_ranking
 
 import numpy as np
 import tensorflow as tf
-
-indexing_scale = [0.25, 0.45, 0.95]
-
-def create_spark_session():
-    spark_conf = SparkConf()
-
-    emr_conf_f = open("/home/howard/dataproc_env_2.txt")
-    conf_lines = emr_conf_f.readlines()
-
-    for conf in conf_lines:
-        conf_set = conf.strip().split(";")
-        spark_conf.set(conf_set[0], conf_set[1])
-
-    return SparkSession.builder \
-                .appName("Clpub service") \
-                .master("local[6]") \
-                .config(conf=spark_conf) \
-                .getOrCreate()
-
-spark = create_spark_session()
-
-from pyhive import trino
-
-trino_conn = trino.Connection(host="localhost", port='8098', catalog='hive', schema='default', protocol='http')
-trino_cursor = trino_conn.cursor()
-
-def load_model_re4():
-    def model_creator(config):
-        x_inputs = tf.keras.Input(shape=(3,))
-
-        initializer = tf.keras.initializers.HeNormal()
-        regularizer = tf.keras.regularizers.L2(0.00005)
-
-        linear1 = tf.keras.layers.Dense(units=32, \
-            activation='relu', \
-            kernel_initializer=initializer, \
-            bias_initializer=initializer, \
-            kernel_regularizer=regularizer, \
-            bias_regularizer=regularizer)
-
-        linear2 = tf.keras.layers.Dense(units=32, \
-            activation='relu', \
-            kernel_initializer=initializer, \
-            bias_initializer=initializer, \
-            kernel_regularizer=regularizer, \
-            bias_regularizer=regularizer)
-
-        SVM_layer = tf.keras.layers.Dense(units=16, \
-            kernel_initializer=initializer, \
-            bias_initializer=initializer, \
-            kernel_regularizer=regularizer, \
-            bias_regularizer=regularizer)
-
-        def SVM_linear_loss(y_true, y_pred):
-            loss_t = tf.math.maximum( \
-                0., \
-                tf.math.subtract(1., tf.math.multiply(tf.cast(y_true, tf.float32), y_pred))) \
-            
-            return tf.math.reduce_mean(loss_t)
-        
-        def SVM_binary_metric(y_true, y_pred):
-            pos     = tf.ones(tf.shape(y_true))
-            neg     = tf.math.multiply(pos, tf.constant(-1.))
-
-            pred_label = tf.where(
-                tf.math.less_equal(tf.expand_dims(tf.reduce_mean(y_pred, 1), axis=1), tf.constant(0.)), 
-                neg, pos)
-
-            return tf.math.divide(
-                tf.math.reduce_sum(tf.cast(tf.math.equal(pred_label, tf.cast(y_true, tf.float32)), tf.int32)),
-                tf.gather(tf.shape(y_true), 0)
-            )
-
-        ml_outputs = SVM_layer(linear2(linear1(x_inputs)))
-        model = tf.keras.Model(inputs=x_inputs, outputs=ml_outputs)
-
-        optim = tf.keras.optimizers.Adam(learning_rate=0.0001)
-        model.compile(optimizer=optim, loss=SVM_linear_loss, metrics=[SVM_binary_metric])
-
-        return model
-
-    model = model_creator(None)
-    model.load_weights("/home/howard/recsys/model/re4/model.h5")
-
-    return model
-
-ranker = load_model_re4()
-
-print("===== Collecting user features =====")
-
-trino_cursor.execute("""
-    SELECT author_id, author_name, feature, ranking, org_rank
-    FROM author_feature
-""")
-
-feature_fetch_res = trino_cursor.fetchall()
-
-# # This will cause very high ram usage, each numpy element has fixed equal allocated space
-# user_features = np.array(feature_fetch_res).astype(object)
-
-import pickle
-pickle_dir = "/home/howard/recsys/faiss/re4"
-
-import multiprocessing
-
-list_pickles = os.listdir(pickle_dir)
-
-if "success.p" in list_pickles:
-    user_id                     = pickle.load(open(f"{pickle_dir}/user_id.p", "rb"))
-    user_name                   = pickle.load(open(f"{pickle_dir}/user_name.p", "rb"))
-    user_content_vect           = pickle.load(open(f"{pickle_dir}/user_content_vect.p", "rb"))
-    user_ranking                = pickle.load(open(f"{pickle_dir}/user_ranking.p", "rb"))
-    user_org_rank               = pickle.load(open(f"{pickle_dir}/user_org_rank.p", "rb"))
-    user_content_vect_float     = pickle.load(open(f"{pickle_dir}/user_content_vect_float.p", "rb"))
-else:
-    def parsing_feature_worker(idx, fetch, manager_dict):
-        if idx <= 2:
-            manager_dict[str(idx)] = [r[idx] for r in fetch] 
-        else:
-            manager_dict[str(idx)] = [float(r[idx]) for r in fetch]
-
-    worker_manager = multiprocessing.Manager()
-    manager_dict = worker_manager.dict()
-
-    jobs = []
-
-    for i in range(5):
-        p = multiprocessing.Process(\
-            target=parsing_feature_worker,\
-            args=(i, feature_fetch_res, manager_dict,))
-        
-        jobs.append(p)
-
-    for i in range(0, 3): jobs[i].start()
-    for i in range(0, 3): jobs[i].join()
-
-    for i in range(3, 5): jobs[i].start()
-    for i in range(3, 5): jobs[i].join()
-
-    user_id             = manager_dict['0']
-    user_name           = manager_dict['1']
-    user_content_vect   = manager_dict['2']
-    user_ranking        = manager_dict['3']
-    user_org_rank       = manager_dict['4']
-
-    user_content_vect_float = [
-        [float(x1) for x1 in x.split(";")] for x in user_content_vect
-    ]
-
-    save_msg = {"msg": "SUCCESS"}
-
-    pickle.dump(save_msg, open(f"{pickle_dir}/success.p", "wb"))
-    pickle.dump(user_id, open(f"{pickle_dir}/user_id.p", "wb"))
-    pickle.dump(user_name, open(f"{pickle_dir}/user_name.p", "wb"))
-    pickle.dump(user_content_vect, open(f"{pickle_dir}/user_content_vect.p", "wb"))
-    pickle.dump(user_ranking, open(f"{pickle_dir}/user_ranking.p", "wb"))
-    pickle.dump(user_org_rank, open(f"{pickle_dir}/user_org_rank.p", "wb"))
-    pickle.dump(user_content_vect_float, open(f"{pickle_dir}/user_content_vect_float.p", "wb"))
-
-
-print("===== Done, user features collected! ===== \n")
-
-print("===== Calculating indexing =====")
-
-np_user_content = np.array(user_content_vect_float).astype(np.float32)
-np_ranking = np.expand_dims(np.array(user_ranking).astype(np.float32), axis=1)
-np_org_rank = np.expand_dims(np.array(user_org_rank).astype(np.float32), axis=1)
-
-from sklearn import preprocessing
-content_scaler      = preprocessing.StandardScaler()
-ranking_scaler      = preprocessing.StandardScaler()
-org_rank_scaler     = preprocessing.StandardScaler()
-
-content_scaler.fit(np_user_content)
-ranking_scaler.fit(np_ranking)
-org_rank_scaler.fit(np_org_rank) 
-
-np_features = np.hstack((
-        np.hstack((
-            np.multiply(content_scaler.transform(np_user_content), indexing_scale[0]),
-            np.multiply(ranking_scaler.transform(np_ranking), indexing_scale[1]))),
-        np.multiply(org_rank_scaler.transform(np_org_rank), indexing_scale[2]))).astype(np.float32)
-
-import faiss
-from faiss import index_factory
 from scipy.spatial import distance as sci_distance
-
-feature_dimen   = 66
-num_cluster     = 10000
-num_search      = int(num_cluster * 0.2) # 20% Database
-
-if "search.index" not in os.listdir(pickle_dir):
-    print("=== Training index ...")
-
-    # Indexed with HNSW
-    # Vector transform PCAW
-    # PQ fast scan encoding
-    # 65536 centroids
-
-    # PCA technique is meant to be compressed vector, of course input vector must be larger
-    # Output dimension after transform must be multiple of numer PQ subquantizers
-    index =  index_factory(feature_dimen, f"OPQ16_32,IVF{num_cluster}_HNSW32,PQ16x4fs")
-
-    index.train(np_features)
-    index.add(np_features)
-
-    faiss.write_index(index, f"{pickle_dir}/search.index")
-else:
-    print("=== Loading index ...")
-    index = faiss.read_index(f"{pickle_dir}/search.index")
-
-print("===== Done, index calculated! ===== \n")
-
-index.nprobe = num_search
-
-# # Ugly mock testing
-# distance, idx = index.search(np.array([np_features[5]]), 100)
-
-# Please squeeze first dimension of list_idx like below before passing
-# new_idx, collab_rank = cal_collab_ranking(5, np.squeeze(idx, axis=0))
-# user_idx = single integer
-def cal_collab_ranking(user_feature, list_idx):
-    vect_prox = []
-    for vect in np_user_content[list_idx].tolist():
-        # user_vect = np_user_content[user_idx].tolist()
-        user_vect = user_feature[0]
-        cos_dis = np.float32(sci_distance.cosine(user_vect, vect)).astype(float).item()
-        vect_prox.append(cos_dis)
-
-    ranking_prox = []
-    for rank in np_ranking[list_idx].tolist():
-        # user_rank = np_ranking[user_idx].item()
-        user_rank = user_feature[1]
-        proximity = abs(user_rank - rank[0]) \
-            / max(abs(user_rank), abs(rank[0]))
-
-        ranking_prox.append(proximity)
-
-    org_rank_prox = []
-    for org_rank in np_org_rank[list_idx].tolist():
-        # user_org_rank = np_org_rank[user_idx].item()
-        user_org_rank = user_feature[2]
-        proximity = 1
-        if user_org_rank > 0 or org_rank[0] > 0:
-            proximity = abs(user_org_rank - org_rank[0]) \
-                / max(abs(user_org_rank), abs(org_rank[0]))
-
-        org_rank_prox.append(proximity)
-
-    np_vect_prox = np.expand_dims(np.array(vect_prox).astype(np.float32), axis=1)
-    np_ranking_prox = np.expand_dims(np.array(ranking_prox).astype(np.float32), axis=1)
-    np_org_rank_prox = np.expand_dims(np.array(org_rank_prox).astype(np.float32), axis=1)
-
-    predict_feature = np.hstack((np.hstack((np_vect_prox, np_ranking_prox)), np_org_rank_prox))
-
-    collab_rank = tf.reduce_mean(ranker(predict_feature), 1).numpy()
-
-    idx_sort = np.flip(np.argsort(collab_rank.flatten()), 0)
-
-    return list_idx[idx_sort], collab_rank[idx_sort]
-
-# ===== APIs =====
 
 app = FastAPI()
 
@@ -330,6 +61,35 @@ async def search_author(name: str):
 top_k_ann = 5000
 top_k_recommend = 50
 
+@app.get("/get_info")
+async def get_info(ids: str):
+    res = []
+    for id in ids.split(","):
+        idx = user_id.index(id)
+
+        user_feature_content = user_content_vect_float[idx]
+        user_feature_rank = user_ranking[idx]
+        user_feature_org_rank = user_org_rank[idx]
+        
+        np_user_feature_content = np.expand_dims(
+            np.array(user_feature_content).astype(np.float32), axis=0)
+        np_user_feature_content_med = np.expand_dims(np.median(np_user_feature_content, axis=1), axis=1)
+        np_user_feature_rank = np.expand_dims(np.array([user_feature_rank]).astype(np.float32), axis=1)
+        np_user_feature_org_rank = np.expand_dims(
+            np.array([user_feature_org_rank]).astype(np.float32), axis=1)
+
+        res.append({
+            "user_id": user_id[idx],
+            "name": user_name[idx],
+            "content": np.multiply(content_scaler.transform(np_user_feature_content_med), indexing_scale[0]).tolist(),
+            "ranking": np.multiply(ranking_scaler.transform(np_user_feature_rank), indexing_scale[1]).tolist(),
+            "org_rank": np.multiply(org_rank_scaler.transform(np_user_feature_org_rank), indexing_scale[2]).tolist(),
+        })
+
+    return {
+        "result": res
+    }
+
 # Tin Huynh Id: 53f47e76dabfaec09f299f95
 @app.get("/recommend")
 async def recommend_author(id: str):
@@ -347,19 +107,23 @@ async def recommend_author(id: str):
 
     np_user_feature_content = np.expand_dims(
         np.array(user_feature_content).astype(np.float32), axis=0)
+    np_user_feature_content_med = np.expand_dims(np.median(np_user_feature_content, axis=1), axis=1)
     np_user_feature_rank = np.expand_dims(np.array([user_feature_rank]).astype(np.float32), axis=1)
     np_user_feature_org_rank = np.expand_dims(
         np.array([user_feature_org_rank]).astype(np.float32), axis=1)
 
     np_user_feature = np.hstack((
             np.hstack((
-                np.multiply(content_scaler.transform(np_user_feature_content), indexing_scale[0]), 
+                np.multiply(content_scaler.transform(np_user_feature_content_med), indexing_scale[0]), 
                 np.multiply(ranking_scaler.transform(np_user_feature_rank), indexing_scale[1]))), 
             np.multiply(org_rank_scaler.transform(np_user_feature_org_rank), indexing_scale[2]))).astype(np.float32)
 
     distances, idxs = index.search(np_user_feature, top_k_ann)
 
-    query_idx = user_id.index(id)
+    if id not in user_id:
+        query_idx = -1    
+    else: query_idx = user_id.index(id)
+
     squeezed_idxs = np.squeeze(idxs, axis=0)
 
     sorted_idx, collab_rank = cal_collab_ranking([user_feature_content, user_feature_rank, user_feature_org_rank], \
@@ -379,4 +143,108 @@ async def recommend_author(id: str):
 
     return {
         "result": rec_author
+    }
+
+@app.get("/search_org")
+async def search_org(name: str):
+    trino_cursor.execute(f"""
+        SELECT name
+        FROM organization
+        WHERE LOWER(name) LIKE '%{name.lower()}%'
+        LIMIT 200
+    """)
+    rows = trino_cursor.fetchall()
+
+    return {
+        "result": rows
+    }
+
+class PairOrgPost(BaseModel):
+    org1: str
+    org2: str
+
+@app.post("/recommend_org")
+async def recommend_org(payload: PairOrgPost):
+
+    trino_cursor.execute(f"""
+        SELECT DISTINCT author_id
+        FROM published_history
+        WHERE author_org = '{payload.org1}'
+    """)
+
+    _list_id_org1 = trino_cursor.fetchall()
+    list_id_org1 = [x[0] for x in _list_id_org1]
+
+    trino_cursor.execute(f"""
+        SELECT DISTINCT author_id
+        FROM published_history
+        WHERE author_org = '{payload.org2}'
+    """)
+
+    _list_id_org2 = trino_cursor.fetchall()
+    list_id_org2 = [x[0] for x in _list_id_org2]
+
+    filtered_id2 = list(filter(lambda x: x not in list_id_org1, list_id_org2))
+
+    list_pairs      = []
+    list_cos_dis    = []
+    list_ranking    = []
+    list_org_rank   = []
+
+    for id1 in list_id_org1:
+        for id2 in filtered_id2:
+            u1_idx = user_id.index(id1)
+            u2_idx = user_id.index(id2)
+
+            list_pairs.append([u1_idx, u2_idx])
+
+            u1_content_vect = user_content_vect_float[u1_idx]
+            u2_content_vect = user_content_vect_float[u2_idx]
+
+            u1_ranking = user_ranking[u1_idx]
+            u2_ranking = user_ranking[u2_idx]
+
+            u1_org_rank = user_org_rank[u1_idx]
+            u2_org_rank = user_org_rank[u2_idx]
+
+            cos_dis = np.float32(sci_distance.cosine(u1_content_vect, u2_content_vect))\
+                .astype(float).item()
+            ranking_prox = abs(u1_ranking - u2_ranking) \
+                / max(abs(u1_ranking), abs(u2_ranking))
+            org_rank_prox = 1.
+            if u1_org_rank > 0 or u2_org_rank > 0:
+                org_rank_prox = abs(u1_org_rank - u2_org_rank) \
+                    / max(abs(u1_org_rank), abs(u2_org_rank))
+            
+            list_cos_dis.append(cos_dis)
+            list_ranking.append(ranking_prox)
+            list_org_rank.append(org_rank_prox)
+
+    np_pairs = np.array(list_pairs)
+    np_vect_prox = np.expand_dims(np.array(list_cos_dis).astype(np.float32), axis=1)
+    np_ranking_prox = np.expand_dims(np.array(list_ranking).astype(np.float32), axis=1)
+    np_org_rank_prox = np.expand_dims(np.array(list_org_rank).astype(np.float32), axis=1)
+
+    predict_feature = np.hstack((np.hstack((np_vect_prox, np_ranking_prox)), np_org_rank_prox))\
+        .astype(np.float32)
+
+    collab_rank = tf.reduce_mean(ranker(predict_feature), 1).numpy()
+
+    idx_sort = np.flip(np.argsort(collab_rank.flatten()), 0)
+
+    pairs_idx = np_pairs[idx_sort].tolist()
+    lst_collab_rank = collab_rank[idx_sort].tolist()
+
+    return {
+        "result": [
+            {
+                "org_1": payload.org1,
+                "author_id_1": user_id[x[0]],
+                "author_name_1": user_name[x[0]],
+                "org_2": payload.org2,
+                "author_id_2": user_id[x[1]],
+                "author_name_2": user_name[x[1]],
+                "rank": lst_collab_rank[i]
+            } for i, x in enumerate(pairs_idx)
+        ]
     }

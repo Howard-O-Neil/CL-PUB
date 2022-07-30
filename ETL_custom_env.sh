@@ -40,5 +40,5 @@ python -m pip install --upgrade 'pyhive[trino]'
 # use within python os environ
 export HADOOP_CONF_DIR=/etc/hadoop/conf
 
-# create zip for ETLs
-zip -r pyenv.zip /home/howard/miniconda3/envs/pyenv
+# Create tar gzip for ETLs
+conda pack -f -o pyenv.tar.gz

@@ -56,7 +56,7 @@ index.train(x_train)
 index.add(x_train)
 
 np.savetxt("/home/howard/recsys/faiss/re4/sample_query.out", query, delimiter=",", fmt="%s")
-faiss.write_index(index, "/home/howard/recsys/faiss/re4/search_sample.index")
+faiss.write_index(index, "/home/howard/recsys/faiss/re4/sample_search.index")
 
 index.nprobe = num_search
 
@@ -68,7 +68,7 @@ import numpy as np
 import faiss
 from faiss import index_factory
 
-index = faiss.read_index("/home/howard/recsys/faiss/re4/search_sample.index")
+index = faiss.read_index("/home/howard/recsys/faiss/re4/sample_search.index")
 query = np.expand_dims(
     np.loadtxt("/home/howard/recsys/faiss/re4/sample_query.out", delimiter=",", dtype=np.float32),
     axis=0
