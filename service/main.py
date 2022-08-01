@@ -93,17 +93,19 @@ async def get_info(ids: str):
 # Tin Huynh Id: 53f47e76dabfaec09f299f95
 @app.get("/recommend")
 async def recommend_author(id: str):
-    trino_cursor.execute(f"""
-        SELECT author_id, author_name, feature, ranking, org_rank
-        FROM author_feature
-        WHERE author_id = '{id}'
-    """)
+    # trino_cursor.execute(f"""
+    #     SELECT author_id, author_name, feature, ranking, org_rank
+    #     FROM author_feature
+    #     WHERE author_id = '{id}'
+    # """)
 
-    user_row = trino_cursor.fetchall()[0]
+    # user_row = trino_cursor.fetchall()[0]
 
-    user_feature_content = list(map(lambda x: float(x), user_row[2].split(";")))
-    user_feature_rank = user_row[3]
-    user_feature_org_rank = user_row[4]
+    usr_idx = user_id.index(id)
+
+    user_feature_content = user_content_vect_float[usr_idx]
+    user_feature_rank = user_ranking[usr_idx]
+    user_feature_org_rank = user_org_rank[usr_idx]
 
     np_user_feature_content = np.expand_dims(
         np.array(user_feature_content).astype(np.float32), axis=0)
@@ -247,4 +249,114 @@ async def recommend_org(payload: PairOrgPost):
                 "rank": lst_collab_rank[i]
             } for i, x in enumerate(pairs_idx)
         ]
+    }
+
+@app.get("/search_paper")
+async def search_paper(name: str):
+    trino_cursor.execute(f"""
+        SELECT title, authors_id, authors_name, year, venue_raw, doi
+        FROM paper_info
+        WHERE LOWER(title) LIKE '%{name.lower()}%'
+        LIMIT 200
+    """)
+    rows = trino_cursor.fetchall()
+
+    return {
+        "result": [
+            {
+                "paper_title": x[0],
+                "author_id": x[1],
+                "author_name": x[2],
+                "venue_raw": x[4],
+                "year": float(x[3]),
+                "doi": x[5]
+            } for x in rows
+        ]
+    }
+
+from typing import List
+class RecordedAuthorIdsPost(BaseModel):
+    recorded: List[List[str]]
+
+@app.post("/recommend_author_on_paper")
+async def recommend_author_on_paper(payload: RecordedAuthorIdsPost):
+    list_id = []
+    for ath_ids in payload.recorded:
+        for id in ath_ids:
+            list_id.append(id)
+
+    list_feature_content = []
+    list_feature_rank = []
+    list_feature_org_rank = []
+
+    for id in list_id:
+        user_idx = user_id.index(id)
+
+        list_feature_content.append(user_content_vect_float[user_idx])
+        list_feature_rank.append(user_ranking[user_idx])
+        list_feature_org_rank.append(user_org_rank[user_idx])
+
+    mean_feature_content = np.expand_dims(
+        np.expand_dims(np.median(np.median(np.array(list_feature_content).astype(np.float32), axis=0)), axis=0),
+        axis=1
+    )
+    mean_feature_rank = np.expand_dims(
+        np.expand_dims(np.median(np.array(list_feature_rank).astype(np.float32)), axis=0),
+        axis=1
+    )
+    mean_feature_org_rank = np.expand_dims(
+        np.expand_dims(np.median(np.array(list_feature_org_rank).astype(np.float32)), axis=0),
+        axis=1
+    ) 
+
+    avg_user_feature = np.hstack((
+            np.hstack((
+                np.multiply(content_scaler.transform(mean_feature_content), indexing_scale[0]), 
+                np.multiply(ranking_scaler.transform(mean_feature_rank), indexing_scale[1]))), 
+            np.multiply(org_rank_scaler.transform(mean_feature_org_rank), indexing_scale[2]))).astype(np.float32)
+
+    _, _nn_user_idx = index.search(avg_user_feature, 1)
+
+    nn_user_idx = np.squeeze(_nn_user_idx, axis=0).tolist()[0]
+    
+    user_feature_content = user_content_vect_float[nn_user_idx]
+    user_feature_rank = user_ranking[nn_user_idx]
+    user_feature_org_rank = user_org_rank[nn_user_idx]
+
+    np_user_feature_content = np.expand_dims(
+        np.array(user_feature_content).astype(np.float32), axis=0)
+    np_user_feature_content_med = np.expand_dims(np.median(np_user_feature_content, axis=1), axis=1)
+    np_user_feature_rank = np.expand_dims(np.array([user_feature_rank]).astype(np.float32), axis=1)
+    np_user_feature_org_rank = np.expand_dims(
+        np.array([user_feature_org_rank]).astype(np.float32), axis=1)
+
+    np_user_feature = np.hstack((
+            np.hstack((
+                np.multiply(content_scaler.transform(np_user_feature_content_med), indexing_scale[0]), 
+                np.multiply(ranking_scaler.transform(np_user_feature_rank), indexing_scale[1]))), 
+            np.multiply(org_rank_scaler.transform(np_user_feature_org_rank), indexing_scale[2]))).astype(np.float32)
+
+    distances, idxs = index.search(np_user_feature, top_k_ann)
+
+    query_idx = nn_user_idx
+
+    squeezed_idxs = np.squeeze(idxs, axis=0)
+
+    sorted_idx, collab_rank = cal_collab_ranking([user_feature_content, user_feature_rank, user_feature_org_rank], \
+        squeezed_idxs[squeezed_idxs != query_idx])
+    
+    lst_sorted_idx = sorted_idx[0:top_k_recommend].tolist()
+    lst_collab_rank = collab_rank[0:top_k_recommend].tolist()
+    
+    rec_author = []
+
+    for _i, i in enumerate(lst_sorted_idx):
+        rec_author.append({
+            "author_id": user_id[i],
+            "author_name": user_name[i],
+            "author_rank": lst_collab_rank[_i]
+        })
+
+    return {
+        "result": rec_author
     }
