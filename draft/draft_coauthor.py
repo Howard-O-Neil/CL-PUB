@@ -22,7 +22,7 @@ import uuid
 count_parquet       = 0
 # source              = "/home/hadoop/virtual/data/dataset/arnet/citation/dblpv13.json"
 source_prefix       = "/home/hadoop/spark/arnet/tables/coauthor/parts/"
-coauthor_dir        = "s3://recsys-bucket-1/data_lake/arnet/tables/coauthor/merge-0"
+coauthor_dir        = "gs://clpub/data_lake/arnet/tables/coauthor/merge-0"
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate())
 
@@ -45,8 +45,14 @@ coauthor_df = spark.read.schema(deptSchema).parquet(coauthor_dir)
 coauthor_df.createOrReplaceTempView("coauthor_df")
 
 spark.sql("""
-    select count(distinct author1_id)
-    from coauthor_df
+    select count(distinct tp_tab.author_id)
+    from (
+        select author1_id as author_id
+        from coauthor_df
+        union
+        select author2_id as author_id
+        from coauthor_df
+    ) as tp_tab
 """).show()
 
 spark.sql("""

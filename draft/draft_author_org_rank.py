@@ -19,15 +19,13 @@ import pyspark.sql.functions as sparkf
 import copy
 import uuid
 
-author_org_rank_dir = "s3://recsys-bucket-1/data_lake/arnet/tables/author_org_rank/merge-0"
+author_org_rank_dir = "gs://clpub/data_lake/arnet/tables/author_org_rank/merge-0"
 
 spark = (pyspark.sql.SparkSession.builder.getOrCreate())
 
 ranking_schema = StructType([
     StructField("author_id", StringType(), False),
-    StructField("author_org", StringType(), False),
     StructField("org_rank", FloatType(), False),
-    StructField("computed", IntegerType(), False),
 ])
 
 author_org_rank_df = spark.read.schema(ranking_schema).parquet(author_org_rank_dir)
@@ -35,8 +33,12 @@ author_org_rank_df.createOrReplaceTempView("author_org_rank_df")
 
 author_org_rank_df.count()
 
+# tin huynh id  : 53f47e76dabfaec09f299f95
+# kiem hoang id : 53f466c4dabfaeb22f53ee97 
+
 spark.sql("""
     select *
     from author_org_rank_df
-    where computed = 1
+    where author_id = '53f47e76dabfaec09f299f95'
+        or author_id = '53f466c4dabfaeb22f53ee97'
 """).show()

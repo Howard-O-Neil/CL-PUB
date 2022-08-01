@@ -19,7 +19,7 @@ import pyspark.sql.functions as sparkf
 import copy
 import uuid
 
-org_group_path = "s3://recsys-bucket-1/data_lake/arnet/tables/org_group/merge-0"
+org_group_path = "gs://clpub/data_lake/arnet/tables/org_group/merge-0"
 
 group_struct = StructType([
     StructField("group", LongType(), False),

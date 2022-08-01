@@ -19,7 +19,7 @@ import pyspark.sql.functions as sparkf
 import copy
 import uuid
 
-author_vect_dir    = "s3://recsys-bucket-1/data_lake/arnet/tables/author_vect/merge-0"
+author_vect_dir    = "gs://clpub/data_lake/arnet/tables/author_vect/merge-0"
 
 author_vect_schema = StructType([
     StructField('author_id', StringType(), False),

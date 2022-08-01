@@ -224,3 +224,12 @@ EC2:
 
 start-AWS-cli:
 	docker run --rm -it --entrypoint bash amazon/aws-cli:latest
+
+up-cl-pub:
+	@docker-compose.exe -f *gpu.yaml up cl-pub -d
+
+commit-cl-pub:
+	@docker.exe commit cl-pub cl-pub:version1.0
+
+down-cl-pub:
+	@docker-compose.exe -f *gpu.yaml down --remove-orphans
